@@ -67,31 +67,137 @@ machamp_configure_shell() {
     VENV_DIR="$HOME/.curlthis_venv"
     BIN_DIR="$VENV_DIR/bin"
     
+    # Create a symlink in a common bin directory
+    LOCAL_BIN="$HOME/.local/bin"
+    if [ ! -d "$LOCAL_BIN" ]; then
+        mkdir -p "$LOCAL_BIN"
+        echo "Created $LOCAL_BIN directory."
+    fi
+    
+    # Find a directory in PATH that we can write to
+    FOUND_PATH_DIR=""
+    IFS=':' read -ra PATH_DIRS <<< "$PATH"
+    for dir in "${PATH_DIRS[@]}"; do
+        if [ -d "$dir" ] && [ -w "$dir" ] && [ "$dir" != "$LOCAL_BIN" ]; then
+            FOUND_PATH_DIR="$dir"
+            break
+        fi
+    done
+    
+    # Try to create a direct executable in /usr/local/bin if possible (requires sudo)
+    SYSTEM_BIN="/usr/local/bin"
+    if [ -d "$SYSTEM_BIN" ] && [ -w "$SYSTEM_BIN" ]; then
+        echo "Found writable $SYSTEM_BIN directory, creating executable there..."
+        # Create a wrapper script that activates the venv and runs the command
+        cat > "$SYSTEM_BIN/curlthis" << EOF
+#!/bin/bash
+source "$VENV_DIR/bin/activate"
+python -m curlthis "\$@"
+EOF
+        chmod +x "$SYSTEM_BIN/curlthis"
+        echo "Created executable in $SYSTEM_BIN"
+        FOUND_PATH_DIR="$SYSTEM_BIN"
+    fi
+    
+    # Create symlink to curlthis in ~/.local/bin
+    if [ -f "$BIN_DIR/curlthis" ]; then
+        ln -sf "$BIN_DIR/curlthis" "$LOCAL_BIN/curlthis"
+        echo "Created symlink for curlthis in $LOCAL_BIN"
+        chmod +x "$LOCAL_BIN/curlthis"
+    else
+        # Create a wrapper script that activates the venv and runs the module
+        cat > "$LOCAL_BIN/curlthis" << EOF
+#!/bin/bash
+source "$VENV_DIR/bin/activate"
+python -m curlthis "\$@"
+EOF
+        chmod +x "$LOCAL_BIN/curlthis"
+        echo "Created wrapper script in $LOCAL_BIN"
+    fi
+    
+    # If we found a directory in PATH, create a symlink there too
+    if [ -n "$FOUND_PATH_DIR" ] && [ "$FOUND_PATH_DIR" != "$SYSTEM_BIN" ]; then
+        ln -sf "$LOCAL_BIN/curlthis" "$FOUND_PATH_DIR/curlthis"
+        echo -e "${GREEN}Created symlink in $FOUND_PATH_DIR which is already in your PATH${NC}"
+        echo -e "${GREEN}curlthis is now immediately available!${NC}"
+    fi
+    
     # Detect shell type
     SHELL_TYPE=$(basename "$SHELL")
     RC_FILE=""
     
     case "$SHELL_TYPE" in
         bash)
-            RC_FILE="$HOME/.bashrc"
+            RC_FILES=("$HOME/.bashrc" "$HOME/.bash_profile")
             ;;
         zsh)
-            RC_FILE="$HOME/.zshrc"
+            RC_FILES=("$HOME/.zshrc" "$HOME/.zprofile")
+            ;;
+        fish)
+            RC_FILES=("$HOME/.config/fish/config.fish")
             ;;
         *)
-            echo -e "${YELLOW}Unsupported shell: $SHELL_TYPE. You may need to manually add $BIN_DIR to your PATH.${NC}"
-            return 1
+            echo -e "${YELLOW}Unsupported shell: $SHELL_TYPE. Adding to common shell files.${NC}"
+            RC_FILES=("$HOME/.profile")
             ;;
     esac
     
-    # Check if BIN_DIR is already in PATH
-    if echo "$PATH" | grep -q "$BIN_DIR"; then
-        echo "Path already configured."
+    # Always include .profile for login shells
+    if ! [[ "${RC_FILES[@]}" =~ "$HOME/.profile" ]]; then
+        RC_FILES+=("$HOME/.profile")
+    fi
+    
+    # Add both BIN_DIR and LOCAL_BIN to PATH in appropriate RC files
+    PATH_UPDATED=false
+    
+    for RC_FILE in "${RC_FILES[@]}"; do
+        # Create the file if it doesn't exist
+        if [ ! -f "$RC_FILE" ]; then
+            mkdir -p "$(dirname "$RC_FILE")"
+            touch "$RC_FILE"
+            echo "Created $RC_FILE"
+        fi
+        
+        # Check if paths are already in RC file
+        if ! grep -q "# curlthis path configuration" "$RC_FILE"; then
+            echo "" >> "$RC_FILE"
+            echo "# curlthis path configuration" >> "$RC_FILE"
+            
+            # For fish shell, use the fish syntax
+            if [[ "$RC_FILE" == *"fish"* ]]; then
+                echo "set -gx PATH \$PATH $BIN_DIR $LOCAL_BIN" >> "$RC_FILE"
+            else
+                # Make sure .local/bin comes first in the PATH to ensure it's found
+                echo "export PATH=\"$LOCAL_BIN:$BIN_DIR:\$PATH\"" >> "$RC_FILE"
+            fi
+            
+            echo "Added paths to $RC_FILE"
+            PATH_UPDATED=true
+        fi
+    done
+    
+    # Also update current session PATH - put our paths at the beginning to ensure they're found
+    export PATH="$LOCAL_BIN:$BIN_DIR:$PATH"
+    
+    # Create a function in the current shell that can be used immediately
+    if [ -z "$FOUND_PATH_DIR" ]; then
+        # Define a function for the current shell session
+        cat << EOF
+
+# You can use curlthis immediately in this terminal session
+curlthis() {
+  "$LOCAL_BIN/curlthis" "\$@"
+}
+
+# Try it with: curlthis -h
+EOF
+    fi
+    
+    if [ "$PATH_UPDATED" = true ]; then
+        echo -e "${GREEN}PATH configuration updated in shell configuration files.${NC}"
+        echo -e "${YELLOW}For new terminal sessions, curlthis will be available automatically.${NC}"
     else
-        # Add to PATH in RC file
-        echo "# curlthis path configuration" >> "$RC_FILE"
-        echo "export PATH=\"\$PATH:$BIN_DIR\"" >> "$RC_FILE"
-        echo "Added $BIN_DIR to PATH in $RC_FILE"
+        echo "PATH already configured in shell files."
     fi
     
     echo -e "${GREEN}Shell configuration complete.${NC}"
@@ -104,16 +210,50 @@ hitmonchan_show_success() {
     
     echo -e "${GREEN}curlthis has been successfully installed!${NC}"
     echo ""
-    echo "To use curlthis, you may need to:"
-    echo "  1. Restart your terminal or run: source $RC_FILE"
-    echo "  2. Run 'curlthis' to transform raw HTTP requests from clipboard"
-    echo "  3. Run 'curlthis -h' for help and additional options"
+    echo "curlthis is now available in your terminal!"
+    echo "Try it now with: curlthis -h"
     echo ""
     echo "Example usage:"
     echo "  curlthis -f request.txt    # Read from file"
     echo "  cat request.txt | curlthis  # Read from stdin"
     echo "  curlthis -c                # Copy result to clipboard"
     echo ""
+    
+    # Create a global alias that will work in the current shell session
+    GLOBAL_ALIAS_CREATED=false
+    
+    # Try to create a global alias for the current shell
+    if [ -f "$LOCAL_BIN/curlthis" ]; then
+        # Make the command available in the current shell without restarting
+        CURLTHIS_PATH="$LOCAL_BIN/curlthis"
+        
+        # Export the function to make it available immediately
+        cat << EOF
+
+# You can now use curlthis immediately in this terminal session!
+# Example: curlthis -h
+EOF
+        
+        # Export the function to the current shell
+        export -f curlthis 2>/dev/null || GLOBAL_ALIAS_CREATED=false
+        
+        # If export failed, create a symbolic link in a directory that's likely in PATH
+        if [ "$GLOBAL_ALIAS_CREATED" = false ]; then
+            # Try to find a directory in PATH that we can write to
+            IFS=':' read -ra PATH_DIRS <<< "$PATH"
+            for dir in "${PATH_DIRS[@]}"; do
+                if [ -d "$dir" ] && [ -w "$dir" ]; then
+                    if [ "$dir" != "$LOCAL_BIN" ]; then
+                        ln -sf "$LOCAL_BIN/curlthis" "$dir/curlthis" 2>/dev/null && {
+                            echo -e "${GREEN}Created symlink in $dir which is in your current PATH${NC}"
+                            GLOBAL_ALIAS_CREATED=true
+                            break
+                        }
+                    fi
+                fi
+            done
+        fi
+    fi
     
     return 0
 }
