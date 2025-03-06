@@ -112,3 +112,4 @@ These templates comply with the [Terminal Styling Standards](../terminal_styling
 ## Author
 
 David Diaz (https://github.com/alfdav)
+email = "alfdav@users.noreply.github.com"

@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Example usage of the terminal styling template.
+Example usage of the Pokemon Terminal Styling package.
 
 This example demonstrates how to use the various functions provided by the
-terminal styling template to create a consistent terminal UI.
+Pokemon Terminal Styling package to create a consistent terminal UI.
 """
 
 import time
 import sys
 from typing import Dict, Any, List
 
-# Import functions from the terminal styling template
-from terminal_styling_template import (
+# Import functions from the python_terminal_styling package
+from python_terminal_styling import (
     # UI/Display functions
     hitmonchan_show_banner,
     hitmonchan_show_success,
@@ -50,11 +50,11 @@ from terminal_styling_template import (
 )
 
 def main():
-    """Main function demonstrating the terminal styling template."""
+    """Main function demonstrating the Pokemon Terminal Styling package."""
     # Display banner
     hitmonchan_show_banner(
-        "Terminal Styling Demo",
-        "Demonstration of terminal styling standards",
+        "Pokemon Terminal Styling Demo",
+        "Demonstration of Pokemon-themed terminal styling",
         "David Diaz"
     )
     
@@ -68,7 +68,7 @@ def main():
     # Display info panel
     hitmonchan_display_info_panel(
         "Information",
-        "This is a demonstration of the terminal styling standards.\n"
+        "This is a demonstration of the Pokemon Terminal Styling package.\n"
         "It shows how to use the various functions to create a consistent UI."
     )
     

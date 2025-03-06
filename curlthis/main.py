@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
 Main module for curlthis CLI application.
+
+Author: David Diaz (https://github.com/alfdav)
+Version: 0.1.0
 """
 from typing import Optional, TextIO, List
 import sys

@@ -4,7 +4,7 @@ Pokemon Terminal Styling
 A package providing standardized terminal styling utilities with Pokemon-themed naming.
 """
 
-from pokemon_terminal_styling.pokemon_terminal_styling import (
+from python_terminal_styling.python_terminal_styling import (
     # UI/Display functions
     hitmonchan_show_banner,
     hitmonchan_show_success,
@@ -39,6 +39,6 @@ from pokemon_terminal_styling.pokemon_terminal_styling import (
     machoke_setup_venv,
 )
 
-from pokemon_terminal_styling.pokemon_terminal_styling import get_function_name_suggestion
+from python_terminal_styling.python_terminal_styling import get_function_name_suggestion
 
 __version__ = "0.1.0"

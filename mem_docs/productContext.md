@@ -1,26 +1,75 @@
+[//]: # (File: productContext.md)
+[//]: # (Author: David Diaz (https://github.com/alfdav))
+[//]: # (Last Updated: March 6, 2025, 11:38 AM (America/Chicago, UTC-6:00))
+[//]: # (Description: Documents the product context and purpose of the curlthis project)
+
 # Product Context
 
 ## Why this project exists
 
-This project, `curlthis`, exists to simplify the process of converting raw HTTP requests into curl commands. This is useful for developers who need to quickly generate curl commands for testing, debugging, or documentation purposes.
+This project, `curlthis`, exists to simplify the process of converting raw HTTP requests into curl commands. It was created to address a common workflow challenge faced by developers, API testers, and security professionals who frequently need to:
+
+- Convert captured HTTP requests from browsers or proxy tools into executable curl commands
+- Transform API documentation examples into testable commands
+- Share HTTP requests in a format that can be easily executed by others
+- Document API interactions in a standardized, executable format
 
 ## What problems it solves
 
-`curlthis` solves the problem of manually constructing curl commands from raw HTTP requests. This can be a tedious and error-prone process, especially for complex requests with many headers and a body. `curlthis` automates this process, making it faster and easier to generate accurate curl commands.
+`curlthis` solves several key problems:
+
+1. **Manual Conversion Complexity**: Manually constructing curl commands from raw HTTP requests is tedious and error-prone, especially for complex requests with numerous headers and structured bodies.
+
+2. **Format Inconsistency**: Different tools capture HTTP requests in slightly different formats, making it difficult to develop a consistent workflow.
+
+3. **Clipboard Workflow Friction**: Developers often copy HTTP requests from various sources and need to quickly convert them without saving temporary files.
+
+4. **Syntax Errors**: Properly escaping special characters and formatting request bodies in curl commands requires attention to detail that is easy to miss.
+
+5. **Time Efficiency**: What might take minutes to manually convert can be done instantly with `curlthis`.
 
 ## How it should work
 
-The application should take a raw HTTP request as input, parse it into its constituent parts (method, URL, headers, body), and then format these parts into a valid curl command. The application should support reading input from a file, stdin, or the clipboard. It should also support copying the generated curl command to the clipboard.
+The application follows a simple and intuitive workflow:
+
+1. **Input Flexibility**:
+   - Read raw HTTP requests from files using the `-f/--file` option
+   - Accept input from stdin when piped
+   - Automatically read from clipboard when no other input is provided
+
+2. **Processing Pipeline**:
+   - Parse the raw request into structured components (method, URL, headers, body)
+   - Intelligently handle different content types, especially JSON
+   - Format the components into a valid curl command with proper escaping
+
+3. **Output Options**:
+   - Display the generated curl command with syntax highlighting in the terminal
+   - Copy the result to the clipboard with the `-c/--clipboard` option
+   - Provide verbose output with the `-v/--verbose` option to show processing steps
+
+4. **User Experience**:
+   - Provide clear, styled error messages for invalid inputs
+   - Show helpful usage examples in the help text
+   - Use consistent visual styling for all output
+   - Maintain comprehensive documentation with proper attribution (2025-03-06 11:34)
 
 ## Pokemon Function Naming Convention
 
 As a project created after February 17, 2025, `curlthis` follows the Pokemon Function Naming Convention with:
 
 ### Psychic Types (Data Processing)
-- `alakazam_parse_request()` - Parses raw HTTP requests into structured data
-- `kadabra_format_curl()` - Transforms parsed data into curl command strings
+- `alakazam_parse_request()` - Parses raw HTTP requests into structured data using Alakazam's analytical abilities
+- `kadabra_format_curl()` - Transforms parsed data into curl command strings with Kadabra's transformation skills
 
 ### Fighting Types (System Operations)
-- `machamp_process_request()` - Main processing function handling multiple inputs/outputs
-- `hitmonchan_show_banner()` - Displays application banner with precision
-- `primeape_show_error()` - Handles and displays errors with appropriate intensity
+- `machamp_process_request()` - Main processing function handling multiple inputs/outputs with Machamp's multi-armed capability
+- `hitmonchan_show_banner()` - Displays application banner with Hitmonchan's precision
+- `hitmonchan_show_success()` - Shows success messages with clear visual indicators
+- `hitmonchan_show_progress()` - Displays progress information during processing
+- `primeape_show_error()` - Handles and displays errors with Primeape's intensity
+- `primeape_show_warning()` - Shows warning messages for potential issues
+
+The installation scripts also follow this convention with:
+- `hitmonlee_verify_python()` - Verifies Python installation requirements
+- `machoke_setup_venv()` - Sets up the virtual environment
+- `machamp_configure_shell()` - Configures shell environment for the application

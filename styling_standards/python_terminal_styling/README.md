@@ -1,6 +1,6 @@
-# Terminal Styling Template
+# Pokemon Terminal Styling
 
-This template provides standardized terminal styling utilities following the Pokemon-themed naming convention as defined in the [Terminal Styling Standards](../terminal_styling_standards.md).
+A Python package providing standardized terminal styling utilities with Pokemon-themed naming conventions.
 
 ## Features
 
@@ -12,11 +12,34 @@ This template provides standardized terminal styling utilities following the Pok
 
 ## Installation
 
-1. Copy this template folder to your project
-2. Install the required dependencies:
+### From PyPI (Not Yet Available)
 
 ```bash
-pip install -r requirements.txt
+pip install pokemon-terminal-styling
+```
+
+### From Source
+
+```bash
+# Clone the repository
+git clone https://github.com/alfdav/pokemon-terminal-styling.git
+cd pokemon-terminal-styling
+
+# Install in development mode
+pip install -e .
+
+# Or build and install
+pip install build
+python -m build
+pip install dist/python_terminal_styling-0.1.0-py3-none-any.whl
+```
+
+### In Your Project
+
+You can also install directly from the directory:
+
+```bash
+pip install -e /path/to/python_terminal_styling
 ```
 
 ## Usage
@@ -24,7 +47,7 @@ pip install -r requirements.txt
 ### Basic Usage
 
 ```python
-from terminal_styling_template import (
+from python_terminal_styling import (
     hitmonchan_show_banner,
     hitmonchan_show_success,
     primeape_show_error
@@ -50,10 +73,10 @@ except Exception as e:
 
 ### Pokemon Selection Helper
 
-The template includes a Pokemon selection helper that can suggest appropriate Pokemon names for your functions:
+The package includes a Pokemon selection helper that can suggest appropriate Pokemon names for your functions:
 
 ```python
-from terminal_styling_template import get_function_name_suggestion
+from python_terminal_styling import get_function_name_suggestion
 
 # Get a function name suggestion
 suggestion = get_function_name_suggestion(
@@ -148,12 +171,13 @@ def porygon_fetch_data(url):
 
 ## Example
 
-See the `example.py` file for a complete example of using the terminal styling template.
+See the `example.py` file for a complete example of using the Pokemon Terminal Styling package.
 
 ## License
 
-This template is provided as-is. Users are responsible for proper usage and handling of sensitive data.
+This package is provided under the MIT License. See the LICENSE file for details.
 
 ## Author
 
 David Diaz (https://github.com/alfdav)
+email = "alfdav@users.noreply.github.com"

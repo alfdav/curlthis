@@ -1,3 +1,8 @@
+[//]: # (File: developmentGuidelines.md)
+[//]: # (Author: David Diaz (https://github.com/alfdav))
+[//]: # (Last Updated: March 6, 2025, 11:38 AM (America/Chicago, UTC-6:00))
+[//]: # (Description: Documents the development guidelines and principles for the curlthis project)
+
 # Development Guidelines
 
 - KISS (Keep It Simple, Stupid)
@@ -28,3 +33,11 @@
     - No method call chains (a.b().c().d())
     - Keep dependencies minimal
     - Loose coupling between components
+    
+-   Documentation Standards (2025-03-06 11:34)
+
+    - All source files must include author headers
+    - Memory bank updates must include short-format date/time stamps
+    - Updates to memory bank files should be appended, not overwritten
+    - Documentation should be clear, concise, and comprehensive
+    - Follow the detailed guidelines in `styling_standards/documentation_styling_guidelines.md` (2025-03-06 11:40)

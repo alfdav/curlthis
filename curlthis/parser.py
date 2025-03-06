@@ -1,5 +1,8 @@
 """
 Parser module for raw HTTP requests.
+
+Author: David Diaz (https://github.com/alfdav)
+Version: 0.1.0
 """
 from typing import Dict, Optional, Tuple, Any
 

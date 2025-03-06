@@ -17,7 +17,7 @@ The Python Terminal Styling Template provides:
 
 - Consistent terminal styling using the Rich library
 - Pokemon-themed function naming convention
-- Helper utilities for selecting appropriate Pokemon names
+- Helper utilities for selecting appropriate function names
 - Progress indicators, error handling, and more
 - Cross-platform support
 
@@ -28,7 +28,7 @@ The Python Terminal Styling Template provides:
 cp -r terminal_styling_template your_project/
 
 # Option 2: Install as a package
-cd pokemon_terminal_styling
+cd python_terminal_styling
 pip install -e .
 ```
 

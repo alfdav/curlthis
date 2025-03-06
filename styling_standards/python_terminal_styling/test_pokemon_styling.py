@@ -6,7 +6,7 @@ This script demonstrates how to use the Pokemon Terminal Styling package
 in another project.
 """
 
-from pokemon_terminal_styling import (
+from python_terminal_styling import (
     hitmonchan_show_banner,
     hitmonchan_show_success,
     primeape_show_error,
@@ -28,7 +28,7 @@ def main():
     # Display some code
     sample_code = """
 # Example of using the Pokemon Terminal Styling package
-from pokemon_terminal_styling import hitmonchan_show_banner
+from python_terminal_styling import hitmonchan_show_banner
 
 hitmonchan_show_banner(
     "My Application",

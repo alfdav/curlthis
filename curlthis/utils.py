@@ -4,6 +4,9 @@ Utility module for curlthis CLI styling and output functions.
 This module provides standardized styling functions for the curlthis CLI
 using the Rich library. It follows the Pokemon-themed function naming convention
 with Fighting-type Pokemon for system operations.
+
+Author: David Diaz (https://github.com/alfdav)
+Version: 0.1.0
 """
 from typing import Optional, Any, List, Dict, Union
 import sys
