@@ -31,9 +31,18 @@ The most recent changes include:
 ## Next steps
 
 The project is complete and fully functional. Potential next steps could include:
-- Migrating the `curlthis` application from Click to Typer using the new standards
 - Adding support for more complex HTTP request formats
 - Implementing additional output formats beyond curl (e.g., wget, httpie)
 - Adding unit tests to ensure reliability
 - Creating a web interface for the tool
 - Updating other projects to use the new Typer styling standards
+
+## Recent fixes (2025-03-06 13:03)
+
+Fixed two issues with the CLI interface:
+1. Added support for the `-h` short flag as an alternative to `--help` by configuring Typer's context settings
+2. Fixed the usage message to show "Usage: curlthis [OPTIONS]" instead of "Usage: python -m curlthis [OPTIONS]" by setting the program name explicitly when calling the app
+
+The solution was implemented by:
+- Adding `context_settings={"help_option_names": ["--help", "-h"]}` to the Typer app initialization
+- Setting `prog_name="curlthis"` when calling the app in the main function

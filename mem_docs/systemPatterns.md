@@ -26,6 +26,7 @@ The `curlthis` application is built using Python and consists of several key mod
 *   **Author Headers**: Added standardized author headers to all source files for proper attribution (2025-03-06 11:33)
 *   **Migration to Typer**: Migrated from Click to Typer following the new CLI framework standards (2025-03-06 12:22)
 *   **Improved Installation**: Enhanced installation scripts with clearer user instructions (2025-03-06 12:36)
+*   **CLI Usability Improvements**: Added support for `-h` short flag and fixed usage message to match README (2025-03-06 13:03)
 
 ## Architecture patterns
 

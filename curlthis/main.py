@@ -31,7 +31,8 @@ install_rich_traceback(show_locals=True, width=120, word_wrap=True)
 app = typer.Typer(
     help="Transform raw HTTP requests with headers into curl one-liners",
     add_completion=True,
-    rich_markup_mode="rich"
+    rich_markup_mode="rich",
+    context_settings={"help_option_names": ["--help", "-h"]}
 )
 
 def machamp_create_command_group(name: str, help_text: str) -> typer.Typer:
@@ -129,7 +130,7 @@ def machamp_process_request(
 def main() -> None:
     """Entry point for the application."""
     try:
-        app()
+        app(prog_name="curlthis")
     except Exception as e:
         primeape_show_error("An unexpected error occurred", e)
         raise typer.Exit(code=1)

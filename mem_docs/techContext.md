@@ -69,6 +69,8 @@ The `curlthis` application now uses Typer as its CLI framework, following the es
    - Updated the file input handling to use `Path` from `pathlib`
    - Added proper error handling with `typer.Exit`
    - Maintained the Pokemon naming convention
+   - Added support for `-h` short flag via context settings (2025-03-06 13:03)
+   - Fixed usage message to match README documentation (2025-03-06 13:03)
 
 3. **Reference Resources**:
    - Reference implementation: `styling_standards/python_terminal_styling/typer_template.py`
