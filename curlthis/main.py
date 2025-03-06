@@ -107,9 +107,8 @@ class RichHelpCommand(click.Command):
 def machamp_process_request(file: Optional[TextIO], clipboard: bool, verbose: bool) -> None:
     """Transform raw HTTP requests with headers into curl one-liners.
     
-    Machamp's multiple arms represent its ability to handle multiple inputs and operations
-    simultaneously, making it perfect for the main processing function that coordinates
-    different data sources and outputs.
+    This function processes raw HTTP requests from various inputs (file, stdin, clipboard)
+    and converts them into curl commands that can be executed in a terminal.
     """
     hitmonchan_show_banner(author="David Diaz (https://github.com/alfdav)")
     

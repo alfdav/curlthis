@@ -1,0 +1,30 @@
+{
+  "name": "shell-styling-template",
+  "version": "0.1.0",
+  "description": "Standardized shell script styling templates with Pokemon-themed function naming",
+  "author": "David Diaz <your.email@example.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alfdav/shell-styling-template"
+  },
+  "keywords": [
+    "shell",
+    "bash",
+    "powershell",
+    "styling",
+    "template",
+    "pokemon"
+  ],
+  "files": [
+    "install_template.sh",
+    "install_template.ps1",
+    "example.sh",
+    "example.ps1",
+    "README.md"
+  ],
+  "scripts": {
+    "test:bash": "./example.sh",
+    "test:powershell": "pwsh -File ./example.ps1"
+  }
+}
