@@ -273,9 +273,9 @@ function Invoke-HitmonchanShowSuccess {
     Write-Host "Try it now with: curlthis -h"
     Write-Host ""
     Write-Host "Example usage:" -ForegroundColor $Colors.White
-    Write-Host "  curlthis -f request.txt    # Read from file"
-    Write-Host "  Get-Content request.txt | curlthis  # Read from stdin"
-    Write-Host "  curlthis -c                # Copy result to clipboard"
+    Write-Host "  curlthis -f request.txt    # Read from file" -ForegroundColor $Colors.Gray
+    Write-Host "  Get-Content request.txt | curlthis  # Read from stdin" -ForegroundColor $Colors.Gray
+    Write-Host "  curlthis -c                # Copy result to clipboard" -ForegroundColor $Colors.Gray
     Write-Host ""
     
     # Create a function for the current session
@@ -285,8 +285,9 @@ function Invoke-HitmonchanShowSuccess {
     
     if (Test-Path $cmdWrapper) {
         # Create a PowerShell function for immediate use
-        Write-Host "# Function created for immediate use in this session:" -ForegroundColor $Colors.Cyan
-        Write-Host "function global:curlthis { & '$cmdWrapper' `$args }" -ForegroundColor $Colors.Cyan
+        Write-Host ""
+        Write-Host "curlthis is now ready to use in this terminal session!" -ForegroundColor $Colors.Cyan
+        Write-Host "Try it with: curlthis -h" -ForegroundColor $Colors.Gray
         Write-Host ""
         
         # Actually create the function

@@ -268,9 +268,9 @@ hitmonchan_show_success() {
     echo "Try it now with: curlthis -h"
     echo
     echo -e "${BOLD}Example usage:${NC}"
-    echo "  curlthis -f request.txt    # Read from file"
-    echo "  cat request.txt | curlthis  # Read from stdin"
-    echo "  curlthis -c                # Copy result to clipboard"
+    echo -e "  ${GRAY}curlthis -f request.txt${NC}    # Read from file"
+    echo -e "  ${GRAY}cat request.txt | curlthis${NC}  # Read from stdin"
+    echo -e "  ${GRAY}curlthis -c${NC}                # Copy result to clipboard"
     echo
     
     # Create a global alias that will work in the current shell session
@@ -282,11 +282,10 @@ hitmonchan_show_success() {
         CURLTHIS_PATH="$LOCAL_BIN/curlthis"
         
         # Export the function to make it available immediately
-        cat << EOF
-
-${CYAN}You can now use curlthis immediately in this terminal session!${NC}
-${GRAY}Example: curlthis -h${NC}
-EOF
+        echo
+        echo -e "${CYAN}curlthis is now ready to use in this terminal session!${NC}"
+        echo -e "${GRAY}Try it with: curlthis -h${NC}"
+        echo
         
         # Export the function to the current shell
         export -f curlthis 2>/dev/null || GLOBAL_ALIAS_CREATED=false
