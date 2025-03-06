@@ -139,6 +139,10 @@ machamp_configure_shell() {
     SYSTEM_BIN="/usr/local/bin"
     if [ -d "$SYSTEM_BIN" ] && [ -w "$SYSTEM_BIN" ]; then
         print_info "Found writable $SYSTEM_BIN directory, creating executable there..."
+        # Remove any existing file to avoid symbolic link issues
+        if [ -e "$SYSTEM_BIN/curlthis" ]; then
+            rm -f "$SYSTEM_BIN/curlthis"
+        fi
         # Create a wrapper script that activates the venv and runs the command
         cat > "$SYSTEM_BIN/curlthis" << EOF
 #!/bin/bash
@@ -150,26 +154,35 @@ EOF
         FOUND_PATH_DIR="$SYSTEM_BIN"
     fi
     
-    # Create symlink to curlthis in ~/.local/bin
-    if [ -f "$BIN_DIR/curlthis" ]; then
-        ln -sf "$BIN_DIR/curlthis" "$LOCAL_BIN/curlthis"
-        print_info "Created symlink for curlthis in $LOCAL_BIN"
-        chmod +x "$LOCAL_BIN/curlthis"
-    else
-        # Create a wrapper script that activates the venv and runs the module
-        cat > "$LOCAL_BIN/curlthis" << EOF
+    # Remove any existing file to avoid symbolic link issues
+    if [ -e "$LOCAL_BIN/curlthis" ]; then
+        rm -f "$LOCAL_BIN/curlthis"
+    fi
+    
+    # Create a wrapper script that activates the venv and runs the module
+    cat > "$LOCAL_BIN/curlthis" << EOF
 #!/bin/bash
 source "$VENV_DIR/bin/activate"
 python -m curlthis "\$@"
 EOF
-        chmod +x "$LOCAL_BIN/curlthis"
-        print_info "Created wrapper script in $LOCAL_BIN"
-    fi
+    chmod +x "$LOCAL_BIN/curlthis"
+    print_info "Created wrapper script in $LOCAL_BIN"
     
-    # If we found a directory in PATH, create a symlink there too
+    # If we found a directory in PATH, create a wrapper script there too
     if [ -n "$FOUND_PATH_DIR" ] && [ "$FOUND_PATH_DIR" != "$SYSTEM_BIN" ]; then
-        ln -sf "$LOCAL_BIN/curlthis" "$FOUND_PATH_DIR/curlthis"
-        print_success "Created symlink in $FOUND_PATH_DIR which is already in your PATH"
+        # Remove any existing file to avoid symbolic link issues
+        if [ -e "$FOUND_PATH_DIR/curlthis" ]; then
+            rm -f "$FOUND_PATH_DIR/curlthis"
+        fi
+        
+        # Create a wrapper script that activates the venv and runs the module
+        cat > "$FOUND_PATH_DIR/curlthis" << EOF
+#!/bin/bash
+source "$VENV_DIR/bin/activate"
+python -m curlthis "\$@"
+EOF
+        chmod +x "$FOUND_PATH_DIR/curlthis"
+        print_success "Created wrapper script in $FOUND_PATH_DIR which is already in your PATH"
         print_success "curlthis is now immediately available!"
     fi
     
@@ -230,18 +243,14 @@ EOF
     # Also update current session PATH - put our paths at the beginning to ensure they're found
     export PATH="$LOCAL_BIN:$BIN_DIR:$PATH"
     
-    # Create a function in the current shell that can be used immediately
+    # Provide information about using the command immediately
     if [ -z "$FOUND_PATH_DIR" ]; then
-        # Define a function for the current shell session
-        cat << EOF
-
-# You can use curlthis immediately in this terminal session
-curlthis() {
-  "$LOCAL_BIN/curlthis" "\$@"
-}
-
-# Try it with: curlthis -h
-EOF
+        echo
+        echo "Note: curlthis has been installed, but you may need to restart your terminal"
+        echo "or run the command directly from its location to use it immediately:"
+        echo
+        echo "$LOCAL_BIN/curlthis -h"
+        echo
     fi
     
     if [ "$PATH_UPDATED" = true ]; then
@@ -273,40 +282,16 @@ hitmonchan_show_success() {
     echo -e "  ${GRAY}curlthis -c${NC}                # Copy result to clipboard"
     echo
     
-    # Create a global alias that will work in the current shell session
-    GLOBAL_ALIAS_CREATED=false
-    
-    # Try to create a global alias for the current shell
-    if [ -f "$LOCAL_BIN/curlthis" ]; then
-        # Make the command available in the current shell without restarting
-        CURLTHIS_PATH="$LOCAL_BIN/curlthis"
-        
-        # Export the function to make it available immediately
-        echo
-        echo -e "${CYAN}curlthis is now ready to use in this terminal session!${NC}"
-        echo -e "${GRAY}Try it with: curlthis -h${NC}"
-        echo
-        
-        # Export the function to the current shell
-        export -f curlthis 2>/dev/null || GLOBAL_ALIAS_CREATED=false
-        
-        # If export failed, create a symbolic link in a directory that's likely in PATH
-        if [ "$GLOBAL_ALIAS_CREATED" = false ]; then
-            # Try to find a directory in PATH that we can write to
-            IFS=':' read -ra PATH_DIRS <<< "$PATH"
-            for dir in "${PATH_DIRS[@]}"; do
-                if [ -d "$dir" ] && [ -w "$dir" ]; then
-                    if [ "$dir" != "$LOCAL_BIN" ]; then
-                        ln -sf "$LOCAL_BIN/curlthis" "$dir/curlthis" 2>/dev/null && {
-                            print_success "Created symlink in $dir which is in your current PATH"
-                            GLOBAL_ALIAS_CREATED=true
-                            break
-                        }
-                    fi
-                fi
-            done
-        fi
-    fi
+    # Make the command available in the current shell without restarting
+    echo
+    echo -e "${CYAN}Note: curlthis has been installed, but you may need to restart your terminal${NC}"
+    echo -e "${CYAN}or run the command directly from its location to use it immediately.${NC}"
+    echo
+    echo -e "${GRAY}# Direct path to the curlthis command:${NC}"
+    echo -e "${GRAY}$LOCAL_BIN/curlthis -h${NC}"
+    echo
+    echo -e "${CYAN}For new terminal sessions, curlthis will be available automatically.${NC}"
+    echo
     
     return 0
 }

@@ -9,6 +9,7 @@ A Python package providing standardized terminal styling utilities with Pokemon-
 - Helper utilities for selecting appropriate Pokemon names
 - Progress indicators, error handling, and more
 - Cross-platform support
+- **NEW**: Typer-based CLI template for modern command-line interfaces
 
 ## Installation
 
@@ -70,6 +71,45 @@ try:
 except Exception as e:
     primeape_show_error("Failed to perform operation", e)
 ```
+
+### Typer-based CLI Template (Recommended)
+
+The package now includes a Typer-based template for creating modern CLI applications:
+
+```python
+from python_terminal_styling.typer_template import (
+    app,
+    hitmonchan_show_banner,
+    primeape_show_error,
+    hitmonchan_show_success
+)
+
+@app.command()
+def machamp_process_data(
+    input_file: str = typer.Argument(..., help="Input file path"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output")
+):
+    """Process data from the input file."""
+    hitmonchan_show_banner("Data Processor", "Process data files")
+    
+    try:
+        # Process data
+        hitmonchan_show_success("Data processed successfully")
+    except Exception as e:
+        primeape_show_error("Failed to process data", e)
+
+if __name__ == "__main__":
+    app()
+```
+
+This template provides:
+- Clean, modern CLI interfaces with Typer
+- Built-in rich formatting for help text
+- Type annotations for parameters
+- Command groups for organizing complex CLIs
+- All while maintaining the Pokemon naming convention
+
+See the `typer_template.py` file for a complete reference implementation and the `typer_styling_guide.md` for detailed documentation.
 
 ### Pokemon Selection Helper
 
@@ -142,14 +182,37 @@ def porygon_fetch_data(url):
 ### Processing Functions
 
 - `machamp_process_request`: Process a request with the given input data
+- `machamp_create_command_group`: Create a Typer command group (Typer template only)
 
 ### Verification Functions
 
 - `hitmonlee_verify_python`: Verify Python installation
+- `mewtwo_validate_input`: Validate input against a pattern (Typer template only)
 
 ### Setup Functions
 
 - `machoke_setup_venv`: Set up a virtual environment
+
+## CLI Framework Options
+
+The package provides two options for creating CLI applications:
+
+### 1. Click-based (Original)
+
+The original implementation uses Click with a custom `RichHelpCommand` class to override the default help display.
+
+### 2. Typer-based (Recommended)
+
+The new recommended implementation uses Typer with its built-in rich formatting support. This provides a cleaner, more modern interface with less code.
+
+Key advantages of the Typer implementation:
+- Built-in rich formatting for help text
+- Type annotations for parameters
+- Command groups for organizing complex CLIs
+- Less boilerplate code
+- Cleaner help output
+
+See the `typer_styling_guide.md` document for detailed information on using the Typer template.
 
 ## Pokemon Selection Guide
 
@@ -169,9 +232,10 @@ def porygon_fetch_data(url):
 | **Data Validation** | Mewtwo | Analytical abilities represent validation |
 | **Logging** | Slowbro | Methodical nature represents logging |
 
-## Example
+## Examples
 
-See the `example.py` file for a complete example of using the Pokemon Terminal Styling package.
+- See the `example.py` file for a complete example of using the original Click-based implementation.
+- See the `typer_template.py` file for a complete example of using the new Typer-based implementation.
 
 ## License
 

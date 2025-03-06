@@ -218,9 +218,31 @@ def create_section(title: str, style: str = "cyan") -> None:
     console.print(Rule(title=f"[bold {style}]{title}[/bold {style}]", style=style))
 
 
-def display_code(code: str, language: str = "bash", theme: str = "monokai", 
-                title: str = "Generated code", border_style: str = "green") -> None:
+def kadabra_display_code(code: str, language: str = "bash", title: str = "Generated code") -> None:
     """Display code with syntax highlighting in a panel.
+    
+    Kadabra's transformation abilities make it perfect for formatting and
+    displaying code with proper syntax highlighting.
+    
+    Args:
+        code: The code to display
+        language: The language for syntax highlighting
+        title: The title of the panel
+    """
+    panel = Panel(
+        Syntax(code, language, theme="monokai", word_wrap=True, line_numbers=True),
+        title=f"[bold]{title}[/bold]",
+        border_style="green",
+        expand=False
+    )
+    console.print(panel)
+
+def display_code(code: str, language: str = "bash", theme: str = "monokai",
+                 title: str = "Generated code", border_style: str = "green") -> None:
+    """Display code with syntax highlighting in a panel.
+    
+    Note: This function is maintained for backward compatibility.
+    For new code, use kadabra_display_code() instead.
     
     Args:
         code: The code to display
@@ -231,10 +253,10 @@ def display_code(code: str, language: str = "bash", theme: str = "monokai",
     """
     # Create syntax-highlighted code with standardized styling
     syntax = Syntax(
-        code, 
-        language, 
-        theme=theme, 
-        word_wrap=True, 
+        code,
+        language,
+        theme=theme,
+        word_wrap=True,
         line_numbers=False,
         code_width=100
     )

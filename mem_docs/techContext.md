@@ -1,6 +1,6 @@
 [//]: # (File: techContext.md)
 [//]: # (Author: David Diaz (https://github.com/alfdav))
-[//]: # (Last Updated: March 6, 2025, 11:37 AM (America/Chicago, UTC-6:00))
+[//]: # (Last Updated: March 6, 2025, 12:16 PM (America/Chicago, UTC-6:00))
 [//]: # (Description: Documents the technologies and technical context of the curlthis project)
 
 # Tech Context
@@ -8,8 +8,8 @@
 ## Technologies used
 
 *   **Python 3.8+**: Core programming language
-*   **click 8.0.0+**: Command-line interface creation toolkit
-*   **rich 10.0.0+**: Terminal formatting and styling library
+*   **typer 0.15.1+**: Modern command-line interface framework
+*   **rich 13.9.4+**: Terminal formatting and styling library
 *   **pyperclip 1.8.2+**: Cross-platform clipboard interface
 *   **setuptools**: Python package build and distribution tool
 
@@ -52,3 +52,27 @@ The development setup involves:
 *   **Terminal Support**: Rich formatting requires a terminal that supports ANSI color codes for optimal display.
 *   **Installation Requirements**: The installation scripts require appropriate permissions to create symlinks and modify PATH variables.
 *   **Documentation Standards**: All files require proper author attribution and documentation updates with timestamps (2025-03-06 11:34)
+
+## CLI Framework Implementation
+
+The `curlthis` application now uses Typer as its CLI framework, following the established standards:
+
+1. **Typer Implementation**: The application has been migrated from Click to Typer (version 0.15.1+), which provides several advantages:
+   - Built-in Rich formatting support via `rich_markup_mode="rich"`
+   - Type annotations for parameters
+   - Command groups for organizing complex CLIs
+   - Less boilerplate code
+
+2. **Implementation Details**:
+   - Removed the custom `RichHelpCommand` class as Typer has built-in rich formatting
+   - Added type annotations to function parameters
+   - Updated the file input handling to use `Path` from `pathlib`
+   - Added proper error handling with `typer.Exit`
+   - Maintained the Pokemon naming convention
+
+3. **Reference Resources**:
+   - Reference implementation: `styling_standards/python_terminal_styling/typer_template.py`
+   - Styling guide: `styling_standards/typer_styling_guide.md`
+   - Architectural Decision Record: `styling_standards/adr_001_typer_styling_standard.md`
+
+This migration was completed on March 6, 2025, and the application now fully complies with the CLI framework standards. The installation scripts were also updated to provide clearer instructions for using the application immediately after installation. (2025-03-06 12:36)

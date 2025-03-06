@@ -2,7 +2,7 @@
 
 Transform raw HTTP requests with headers into curl one-liners.
 
-> This project follows the Pokemon Function Naming Convention for projects.
+> This project follows the Pokemon Function Naming Convention and uses the Typer framework for modern CLI interfaces.
 
 ## Installation
 

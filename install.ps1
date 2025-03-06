@@ -175,20 +175,11 @@ function Invoke-MachampConfigureShell {
     
     # Create a .cmd wrapper in the common bin directory
     $cmdWrapper = "$localBin\curlthis.cmd"
-    $exePath = "$binDir\curlthis.exe"
     
-    if (Test-Path $exePath) {
-        # Create a .cmd wrapper that calls the exe
-        "@echo off" | Out-File -FilePath $cmdWrapper -Encoding ascii -Force
-        """$exePath"" %*" | Out-File -FilePath $cmdWrapper -Encoding ascii -Append
-        Write-Info "Created command wrapper at $cmdWrapper"
-    }
-    else {
-        # If exe not found, create a wrapper for the Python module
-        "@echo off" | Out-File -FilePath $cmdWrapper -Encoding ascii -Force
-        """$venvDir\Scripts\activate.bat"" && python -m curlthis %*" | Out-File -FilePath $cmdWrapper -Encoding ascii -Append
-        Write-Info "Created module wrapper at $cmdWrapper"
-    }
+    # Create a wrapper for the Python module
+    "@echo off" | Out-File -FilePath $cmdWrapper -Encoding ascii -Force
+    """$venvDir\Scripts\activate.bat"" && python -m curlthis %*" | Out-File -FilePath $cmdWrapper -Encoding ascii -Append
+    Write-Info "Created module wrapper at $cmdWrapper"
     
     # Create a PowerShell script wrapper too
     $psWrapper = "$localBin\curlthis.ps1"
