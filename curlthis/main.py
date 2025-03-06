@@ -7,93 +7,17 @@ import sys
 import click
 import pyperclip
 
-from rich.console import Console
-from rich.panel import Panel
-from rich.syntax import Syntax
-from rich.traceback import install as install_rich_traceback
-from rich.table import Table
-from rich import box
 from rich.markdown import Markdown
-from rich.rule import Rule
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import BarColumn, TaskProgressColumn
 
 from curlthis.parser import alakazam_parse_request
 from curlthis.formatter import kadabra_format_curl
-
-# Install Rich traceback handler
-install_rich_traceback(show_locals=True, width=120, word_wrap=True)
-
-# Console instances
-console = Console()
-error_console = Console(stderr=True)
-
-# ANSI color codes (for compatibility with other tools)
-GREEN = '\033[0;32m'
-RED = '\033[0;31m'
-YELLOW = '\033[1;33m'
-BLUE = '\033[0;34m'
-CYAN = '\033[0;36m'
-NC = '\033[0m'  # No Color
-
-
-def hitmonchan_show_banner() -> None:
-    """Display application banner.
-    
-    Hitmonchan's precision and presentation style is perfect for displaying
-    the application banner with clean, impactful visual feedback.
-    """
-    # Use the same style as andns2
-    banner = Panel(
-        "[bold cyan]Transform raw HTTP requests into curl one-liners[/bold cyan]",
-        title="[bold]curlthis v0.1.0[/bold]",
-        border_style="blue"
-    )
-    console.print(banner)
-
-
-def primeape_show_error(message: str, exception: Optional[Exception] = None) -> None:
-    """Display error message with optional exception details.
-    
-    Primeape's intense and reactive nature makes it perfect for error handling,
-    quickly responding to problems with clear, attention-grabbing messages.
-    """
-    # Match andns2 error style
-    error_console.print(f"[red][[/red][bold white]✗[/bold white][red]][/red] {message}")
-    if exception and str(exception):
-        error_console.print(f"[dim]{str(exception)}[/dim]")
-
-
-def primeape_show_warning(message: str) -> None:
-    """Display warning message.
-    
-    Primeape's alertness helps identify potential issues that need attention
-    but aren't critical failures.
-    """
-    console.print(f"[yellow][[/yellow][bold white]![/bold white][yellow]][/yellow] {message}")
-
-
-def hitmonchan_show_success(message: str) -> None:
-    """Display success message.
-    
-    Hitmonchan's precision delivers clear success indicators with style.
-    """
-    console.print(f"[green][[/green][bold white]✓[/bold white][green]][/green] {message}")
-
-
-def hitmonchan_show_progress(message: str, spinner: bool = False) -> None:
-    """Display progress message.
-    
-    Hitmonchan's speed and precision are perfect for showing progress updates.
-    """
-    if spinner:
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[blue]{task.description}[/blue]"),
-            transient=True
-        ) as progress:
-            progress.add_task(message, total=None)
-    else:
-        console.print(f"[blue][[/blue][bold white]*[/bold white][blue]][/blue] {message}")
+from curlthis.utils import (
+    console, error_console, STATUS,
+    hitmonchan_show_banner, primeape_show_error, primeape_show_warning,
+    hitmonchan_show_success, hitmonchan_show_progress, create_table,
+    create_section, display_code
+)
 
 
 class RichHelpCommand(click.Command):
@@ -101,22 +25,22 @@ class RichHelpCommand(click.Command):
     
     def format_help(self, ctx, formatter):
         # Use Rich for help display instead of the default formatter
-        hitmonchan_show_banner()
+        hitmonchan_show_banner(author="David Diaz (https://github.com/alfdav)")
         
         # Command description with rule
-        console.print(Rule(title="[bold cyan]Description[/bold cyan]", style="cyan"))
+        create_section("Description")
         console.print(f"{self.help}\n")
         
         # Usage section with rule
         usage_text = self.collect_usage(ctx)
-        console.print(Rule(title="[bold cyan]Usage[/bold cyan]", style="cyan"))
+        create_section("Usage")
         console.print(f"{usage_text}\n")
         
         # Options table with rule
         options = self.collect_options(ctx)
         if options:
-            console.print(Rule(title="[bold cyan]Options[/bold cyan]", style="cyan"))
-            options_table = Table(box=box.ROUNDED, show_header=False, expand=True)
+            create_section("Options")
+            options_table = create_table("", "")
             options_table.add_column("Option", style="bold")
             options_table.add_column("Description")
             
@@ -127,7 +51,7 @@ class RichHelpCommand(click.Command):
             console.print()
         
         # Examples section with rule
-        console.print(Rule(title="[bold cyan]Examples[/bold cyan]", style="cyan"))
+        create_section("Examples")
         examples = [
             ("From a file:", "curlthis -f request.txt"),
             ("From stdin:", "cat request.txt | curlthis"),
@@ -135,7 +59,7 @@ class RichHelpCommand(click.Command):
             ("Verbose output:", "curlthis -f request.txt -v")
         ]
         
-        examples_table = Table(box=box.ROUNDED, show_header=False, expand=True)
+        examples_table = create_table("", "")
         examples_table.add_column("Description", style="bold")
         examples_table.add_column("Command", style="cyan")
         
@@ -187,7 +111,7 @@ def machamp_process_request(file: Optional[TextIO], clipboard: bool, verbose: bo
     simultaneously, making it perfect for the main processing function that coordinates
     different data sources and outputs.
     """
-    hitmonchan_show_banner()
+    hitmonchan_show_banner(author="David Diaz (https://github.com/alfdav)")
     
     # Get input from file, clipboard, or stdin
     raw_request = ""
@@ -228,13 +152,7 @@ def machamp_process_request(file: Optional[TextIO], clipboard: bool, verbose: bo
         curl_command = kadabra_format_curl(request_data)
         
         # Display the result using panel for consistency with andns2
-        result_panel = Panel(
-            Syntax(curl_command, "bash", theme="monokai", word_wrap=True),
-            title="[bold]Generated curl command[/bold]",
-            border_style="green",
-            expand=False
-        )
-        console.print(result_panel)
+        display_code(curl_command, language="bash", theme="monokai", title="Generated curl command")
         
         # Copy to clipboard if requested
         if clipboard:
@@ -251,6 +169,7 @@ def machamp_process_request(file: Optional[TextIO], clipboard: bool, verbose: bo
 def main() -> None:
     """Entry point for the application."""
     machamp_process_request()
+
 
 if __name__ == "__main__":
     main()

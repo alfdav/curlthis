@@ -1,58 +1,130 @@
 # curlthis installation script for Windows
 # Following the Pokemon-themed function naming convention
 
+# Colors for terminal output
+$Colors = @{
+    Red = 'Red'
+    Green = 'Green'
+    Yellow = 'Yellow'
+    Blue = 'Cyan'
+    Cyan = 'Cyan'
+    Gray = 'DarkGray'
+    White = 'White'
+}
+
+# Status indicators
+$Status = @{
+    Info = "[*]"
+    Success = "[✓]"
+    Warning = "[!]"
+    Error = "[✗]"
+}
+
+# Output functions
+function Write-Info {
+    param([string]$Message)
+    Write-Host "$($Status.Info) $Message" -ForegroundColor $Colors.Blue
+}
+
+function Write-Success {
+    param([string]$Message)
+    Write-Host "$($Status.Success) $Message" -ForegroundColor $Colors.Green
+}
+
+function Write-Warning {
+    param([string]$Message)
+    Write-Host "$($Status.Warning) $Message" -ForegroundColor $Colors.Yellow
+}
+
+function Write-Error {
+    param([string]$Message)
+    Write-Host "$($Status.Error) $Message" -ForegroundColor $Colors.Red
+}
+
+function Write-Status {
+    param([string]$Message)
+    Write-Host "==> $Message" -ForegroundColor $Colors.Cyan
+}
+
+function Write-Banner {
+    Write-Host "┌────────────────────────────────────────────┐" -ForegroundColor $Colors.Blue
+    Write-Host "│           curlthis Installer               │" -ForegroundColor $Colors.Blue
+    Write-Host "│                                            │" -ForegroundColor $Colors.Blue
+    Write-Host "│  Transform raw HTTP requests to curl       │" -ForegroundColor $Colors.Blue
+    Write-Host "└────────────────────────────────────────────┘" -ForegroundColor $Colors.Blue
+    Write-Host ""
+}
+
 # System verification function
 function Invoke-HitmonleeVerifyPython {
-    Write-Host "Hitmonlee uses High Jump Kick to verify Python installation..." -ForegroundColor Blue
+    Write-Status "Hitmonlee uses High Jump Kick to verify Python installation..."
     
     try {
         $pythonInfo = python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"
         $pythonVersion = [version]$pythonInfo
         
         if ($pythonVersion -lt [version]"3.8") {
-            Write-Host "Python version $pythonVersion detected. Version 3.8 or higher is required." -ForegroundColor Red
+            Write-Error "Python version $pythonVersion detected. Version 3.8 or higher is required."
             return $false
         }
         
-        Write-Host "Python $pythonVersion detected." -ForegroundColor Green
+        Write-Success "Python $pythonVersion detected."
         return $true
     }
     catch {
-        Write-Host "Python 3 is not installed or not in PATH. Please install Python 3.8 or higher." -ForegroundColor Red
+        Write-Error "Python 3 is not installed or not in PATH. Please install Python 3.8 or higher."
         return $false
     }
 }
 
 # Environment setup function
 function Invoke-MachokeSetupVenv {
-    Write-Host "Machoke uses Strength to set up virtual environment..." -ForegroundColor Blue
+    Write-Status "Machoke uses Strength to set up virtual environment..."
     
     $venvDir = "$env:USERPROFILE\.curlthis_venv"
     
     # Create virtual environment if it doesn't exist
     if (-not (Test-Path $venvDir)) {
-        Write-Host "Creating virtual environment at $venvDir..."
-        python -m venv $venvDir
+        Write-Info "Creating virtual environment at $venvDir..."
+        try {
+            python -m venv $venvDir
+        }
+        catch {
+            Write-Error "Failed to create virtual environment: $_"
+            return $false
+        }
     }
     else {
-        Write-Host "Using existing virtual environment at $venvDir..."
+        Write-Info "Using existing virtual environment at $venvDir..."
     }
     
     # Activate virtual environment
-    & "$venvDir\Scripts\Activate.ps1"
+    try {
+        & "$venvDir\Scripts\Activate.ps1"
+    }
+    catch {
+        Write-Error "Failed to activate virtual environment: $_"
+        return $false
+    }
     
     # Install the package in development mode
-    Write-Host "Installing curlthis..."
-    pip install --upgrade pip
-    pip install -e .
+    Write-Info "Installing curlthis..."
+    try {
+        pip install --upgrade pip
+        pip install -e .
+    }
+    catch {
+        Write-Error "Failed to install curlthis package: $_"
+        return $false
+    }
     
-    Write-Host "Virtual environment setup complete." -ForegroundColor Green
+    Write-Success "Virtual environment setup complete."
     return $true
 }
 
 # System configuration function
 function Invoke-MachampConfigureShell {
-    Write-Host "Machamp uses Dynamic Punch to configure system..." -ForegroundColor Blue
+    Write-Status "Machamp uses Dynamic Punch to configure system..."
     
     $venvDir = "$env:USERPROFILE\.curlthis_venv"
     $binDir = "$venvDir\Scripts"
@@ -61,7 +133,7 @@ function Invoke-MachampConfigureShell {
     $localBin = "$env:USERPROFILE\.local\bin"
     if (-not (Test-Path $localBin)) {
         New-Item -Path $localBin -ItemType Directory -Force | Out-Null
-        Write-Host "Created $localBin directory."
+        Write-Info "Created $localBin directory."
     }
     
     # Find a directory in PATH that we can write to
@@ -74,7 +146,7 @@ function Invoke-MachampConfigureShell {
                 "test" | Out-File -FilePath $testFile -Force -ErrorAction Stop
                 Remove-Item -Path $testFile -Force -ErrorAction Stop
                 $foundPathDir = $dir
-                Write-Host "Found writable directory in PATH: $foundPathDir" -ForegroundColor Green
+                Write-Success "Found writable directory in PATH: $foundPathDir"
                 break
             }
             catch {
@@ -92,12 +164,12 @@ function Invoke-MachampConfigureShell {
             $systemWrapper = "$systemBin\curlthis.cmd"
             "@echo off" | Out-File -FilePath $systemWrapper -Encoding ascii -Force -ErrorAction Stop
             """$venvDir\Scripts\activate.bat"" && python -m curlthis %*" | Out-File -FilePath $systemWrapper -Encoding ascii -Append -ErrorAction Stop
-            Write-Host "Created system-wide command wrapper at $systemWrapper" -ForegroundColor Green
+            Write-Success "Created system-wide command wrapper at $systemWrapper"
             $systemWrapperCreated = $true
             $foundPathDir = $systemBin
         }
         catch {
-            Write-Host "Unable to create system-wide wrapper (requires admin privileges): $_" -ForegroundColor Yellow
+            Write-Warning "Unable to create system-wide wrapper (requires admin privileges): $_"
         }
     }
     
@@ -109,13 +181,13 @@ function Invoke-MachampConfigureShell {
         # Create a .cmd wrapper that calls the exe
         "@echo off" | Out-File -FilePath $cmdWrapper -Encoding ascii -Force
         """$exePath"" %*" | Out-File -FilePath $cmdWrapper -Encoding ascii -Append
-        Write-Host "Created command wrapper at $cmdWrapper"
+        Write-Info "Created command wrapper at $cmdWrapper"
     }
     else {
         # If exe not found, create a wrapper for the Python module
         "@echo off" | Out-File -FilePath $cmdWrapper -Encoding ascii -Force
         """$venvDir\Scripts\activate.bat"" && python -m curlthis %*" | Out-File -FilePath $cmdWrapper -Encoding ascii -Append
-        Write-Host "Created module wrapper at $cmdWrapper"
+        Write-Info "Created module wrapper at $cmdWrapper"
     }
     
     # Create a PowerShell script wrapper too
@@ -123,17 +195,17 @@ function Invoke-MachampConfigureShell {
     "# curlthis PowerShell wrapper" | Out-File -FilePath $psWrapper -Force
     "& '$venvDir\Scripts\Activate.ps1'" | Out-File -FilePath $psWrapper -Append
     "python -m curlthis @args" | Out-File -FilePath $psWrapper -Append
-    Write-Host "Created PowerShell wrapper at $psWrapper"
+    Write-Info "Created PowerShell wrapper at $psWrapper"
     
     # If we found a directory in PATH, create a copy there too (if not already system bin)
     if ($foundPathDir -and -not $systemWrapperCreated -and $foundPathDir -ne $localBin) {
         try {
             Copy-Item -Path $cmdWrapper -Destination "$foundPathDir\curlthis.cmd" -Force -ErrorAction Stop
-            Write-Host "Created command wrapper in $foundPathDir which is already in your PATH" -ForegroundColor Green
-            Write-Host "curlthis is now immediately available!" -ForegroundColor Green
+            Write-Success "Created command wrapper in $foundPathDir which is already in your PATH"
+            Write-Success "curlthis is now immediately available!"
         }
         catch {
-            Write-Host "Unable to create wrapper in $foundPathDir: $_" -ForegroundColor Yellow
+            Write-Warning "Unable to create wrapper in $foundPathDir: $_"
         }
     }
     
@@ -157,7 +229,7 @@ function Invoke-MachampConfigureShell {
     
     # Update the PATH environment variable
     [Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
-    Write-Host "Updated PATH environment variable with $localBin at the beginning" -ForegroundColor Green
+    Write-Success "Updated PATH environment variable with $localBin at the beginning"
     
     # Also update current session PATH
     $env:PATH = $newPath
@@ -166,7 +238,7 @@ function Invoke-MachampConfigureShell {
     $profilePath = $PROFILE.CurrentUserAllHosts
     if (-not (Test-Path $profilePath)) {
         New-Item -Path $profilePath -ItemType File -Force | Out-Null
-        Write-Host "Created PowerShell profile at $profilePath"
+        Write-Info "Created PowerShell profile at $profilePath"
     }
     
     # Add PATH to PowerShell profile if not already there
@@ -174,7 +246,7 @@ function Invoke-MachampConfigureShell {
     if (-not ($profileContent -like "*curlthis path configuration*")) {
         "# curlthis path configuration" | Out-File -FilePath $profilePath -Append
         "$env:PATH = `"$localBin;$binDir;$env:PATH`"" | Out-File -FilePath $profilePath -Append
-        Write-Host "Added PATH configuration to PowerShell profile"
+        Write-Info "Added PATH configuration to PowerShell profile"
     }
     
     # Add a function definition to the profile for immediate use
@@ -182,23 +254,25 @@ function Invoke-MachampConfigureShell {
         "" | Out-File -FilePath $profilePath -Append
         "# curlthis function definition" | Out-File -FilePath $profilePath -Append
         "function global:curlthis { & '$cmdWrapper' `$args }" | Out-File -FilePath $profilePath -Append
-        Write-Host "Added function definition to PowerShell profile"
+        Write-Info "Added function definition to PowerShell profile"
     }
     
-    Write-Host "System configuration complete." -ForegroundColor Green
+    Write-Success "System configuration complete."
     return $true
 }
 
 # User feedback function
 function Invoke-HitmonchanShowSuccess {
-    Write-Host "Hitmonchan uses Sky Uppercut to show installation results..." -ForegroundColor Blue
+    Write-Status "Hitmonchan uses Sky Uppercut to show installation results..."
     
-    Write-Host "curlthis has been successfully installed!" -ForegroundColor Green
+    Write-Banner
+    
+    Write-Success "curlthis has been successfully installed!"
     Write-Host ""
-    Write-Host "curlthis is now available in your terminal!" -ForegroundColor Yellow
+    Write-Host "curlthis is now available in your terminal!" -ForegroundColor $Colors.Cyan
     Write-Host "Try it now with: curlthis -h"
     Write-Host ""
-    Write-Host "Example usage:"
+    Write-Host "Example usage:" -ForegroundColor $Colors.White
     Write-Host "  curlthis -f request.txt    # Read from file"
     Write-Host "  Get-Content request.txt | curlthis  # Read from stdin"
     Write-Host "  curlthis -c                # Copy result to clipboard"
@@ -211,8 +285,8 @@ function Invoke-HitmonchanShowSuccess {
     
     if (Test-Path $cmdWrapper) {
         # Create a PowerShell function for immediate use
-        Write-Host "# Function created for immediate use in this session:" -ForegroundColor Cyan
-        Write-Host "function global:curlthis { & '$cmdWrapper' `$args }" -ForegroundColor Cyan
+        Write-Host "# Function created for immediate use in this session:" -ForegroundColor $Colors.Cyan
+        Write-Host "function global:curlthis { & '$cmdWrapper' `$args }" -ForegroundColor $Colors.Cyan
         Write-Host ""
         
         # Actually create the function
@@ -231,7 +305,7 @@ function Invoke-HitmonchanShowSuccess {
 
 # Main installation process
 function Install-CurlThis {
-    Write-Host "=== curlthis Installation ===" -ForegroundColor Blue
+    Write-Banner
     
     # Verify Python installation
     if (-not (Invoke-HitmonleeVerifyPython)) {
@@ -251,7 +325,7 @@ function Install-CurlThis {
     # Show success message
     Invoke-HitmonchanShowSuccess
     
-    Write-Host "Installation complete!" -ForegroundColor Green
+    Write-Success "Installation complete!"
 }
 
 # Run the installation
