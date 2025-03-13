@@ -49,24 +49,40 @@ cd curlthis
 pip install -e .
 
 # Install development dependencies
-pip install black mypy
+pip install black mypy flake8 pytest isort
 ```
 
 ## Coding Standards
 
 This project follows these standards:
 
-1. **Code Formatting**: Use Black with a line length of 88 characters
+1. **Python PEPs**: All code must adhere to:
+   - [PEP 8](https://www.python.org/dev/peps/pep-0008/): Style Guide for Python Code
+   - [PEP 20](https://www.python.org/dev/peps/pep-0020/): The Zen of Python
+   - [PEP 257](https://www.python.org/dev/peps/pep-0257/): Docstring Conventions
+   - [PEP 517/518](https://www.python.org/dev/peps/pep-0517/): Build System Specification
+
+2. **Code Formatting**: Use Black with a line length of 88 characters
    ```bash
    black curlthis/
    ```
 
-2. **Type Checking**: Use MyPy for static type checking
+3. **Import Sorting**: Use isort configured to be compatible with Black
+   ```bash
+   isort curlthis/
+   ```
+
+4. **Type Checking**: Use MyPy for static type checking
    ```bash
    mypy curlthis/
    ```
 
-3. **Documentation**: All functions should have docstrings following the Google style
+5. **Linting**: Use flake8 for additional linting
+   ```bash
+   flake8 curlthis/
+   ```
+
+6. **Documentation**: All functions, classes, and modules should have Google-style docstrings
 
 ## Testing
 
