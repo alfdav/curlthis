@@ -1,0 +1,94 @@
+# Contributing to curlthis
+
+Thank you for considering contributing to curlthis! This document provides guidelines and instructions for contributing to this project.
+
+## Code of Conduct
+
+By participating in this project, you agree to maintain a respectful and inclusive environment for everyone.
+
+## How to Contribute
+
+### Reporting Bugs
+
+If you find a bug, please create an issue with the following information:
+
+1. A clear, descriptive title
+2. Steps to reproduce the issue
+3. Expected behavior
+4. Actual behavior
+5. Any relevant logs or screenshots
+6. Your environment (OS, Python version, etc.)
+
+### Suggesting Features
+
+Feature suggestions are welcome! Please create an issue with:
+
+1. A clear, descriptive title
+2. A detailed description of the proposed feature
+3. Any relevant examples or use cases
+4. If possible, a rough implementation idea
+
+### Pull Requests
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/your-feature-name`)
+3. Make your changes
+4. Run tests and ensure code quality
+5. Commit your changes (`git commit -m 'Add some feature'`)
+6. Push to the branch (`git push origin feature/your-feature-name`)
+7. Open a Pull Request
+
+## Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/alfdav/curlthis.git
+cd curlthis
+
+# Install in development mode
+pip install -e .
+
+# Install development dependencies
+pip install black mypy
+```
+
+## Coding Standards
+
+This project follows these standards:
+
+1. **Pokemon Function Naming Convention**: Functions are named after Pokemon with types matching their purpose:
+   - Psychic types for data processing (e.g., `alakazam_parse_request`)
+   - Fighting types for system operations (e.g., `machamp_process_request`)
+
+2. **Code Formatting**: Use Black with a line length of 88 characters
+   ```bash
+   black curlthis/
+   ```
+
+3. **Type Checking**: Use MyPy for static type checking
+   ```bash
+   mypy curlthis/
+   ```
+
+4. **Documentation**: All functions should have docstrings following the Google style
+
+## Testing
+
+When adding new features or fixing bugs, please include appropriate tests.
+
+```bash
+# Run tests
+pytest
+```
+
+## Release Process
+
+The maintainers will handle the release process, including:
+
+1. Version bumping in pyproject.toml
+2. Creating release notes
+3. Publishing to PyPI
+
+## License
+
+By contributing to this project, you agree that your contributions will be licensed under the project's MIT license.
