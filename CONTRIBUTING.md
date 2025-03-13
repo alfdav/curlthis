@@ -56,21 +56,17 @@ pip install black mypy
 
 This project follows these standards:
 
-1. **Pokemon Function Naming Convention**: Functions are named after Pokemon with types matching their purpose:
-   - Psychic types for data processing (e.g., `alakazam_parse_request`)
-   - Fighting types for system operations (e.g., `machamp_process_request`)
-
-2. **Code Formatting**: Use Black with a line length of 88 characters
+1. **Code Formatting**: Use Black with a line length of 88 characters
    ```bash
    black curlthis/
    ```
 
-3. **Type Checking**: Use MyPy for static type checking
+2. **Type Checking**: Use MyPy for static type checking
    ```bash
    mypy curlthis/
    ```
 
-4. **Documentation**: All functions should have docstrings following the Google style
+3. **Documentation**: All functions should have docstrings following the Google style
 
 ## Testing
 
@@ -92,3 +88,7 @@ The maintainers will handle the release process, including:
 ## License
 
 By contributing to this project, you agree that your contributions will be licensed under the project's MIT license.
+
+## Disclaimer
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, AUTHORS, OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES.
