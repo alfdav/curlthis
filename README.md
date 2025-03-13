@@ -14,14 +14,6 @@ Transform raw HTTP requests with headers into curl one-liners.
 
 ## Installation
 
-### Using pip
-
-```bash
-pip install curlthis
-```
-
-### From source
-
 ```bash
 # Clone the repository
 git clone https://github.com/alfdav/curlthis.git
