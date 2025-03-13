@@ -1,15 +1,19 @@
 # curlthis
 
-Transform raw HTTP requests with headers into curl one-liners.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Pokemon Naming](https://img.shields.io/badge/naming-pokemon-red.svg)](https://github.com/alfdav/curlthis)
 
-> This project follows the Pokemon Function Naming Convention and uses the Typer framework for modern CLI interfaces.
+## Description
 
-## Features
+curlthis is a streamlined tool that transforms raw HTTP requests into executable curl commands. It elegantly handles headers, request bodies, and proper escaping to simplify API testing and documentation.
+
+## Key Features
 
 - **Input Flexibility**: Read from files, stdin, or automatically from clipboard
-- **Intelligent Parsing**: Handles various HTTP request formats
+- **Intelligent Parsing**: Handles various HTTP request formats with ease
 - **Syntax Highlighting**: Displays curl commands with proper syntax highlighting
-- **Clipboard Integration**: Copy results directly to clipboard
+- **Clipboard Integration**: Copy results directly to clipboard for immediate use
 - **Verbose Mode**: See the processing steps in action
 
 ## Installation
@@ -46,7 +50,9 @@ curlthis -v
 curlthis -h
 ```
 
-## Example
+## Examples
+
+### Example: Converting an HTTP Request
 
 Input:
 ```
@@ -88,6 +94,28 @@ black curlthis/
 mypy curlthis/
 ```
 
+## Project Structure
+
+```
+curlthis/
+├── curlthis/           # Core functionality
+│   ├── __init__.py
+│   ├── __main__.py     # Entry point
+│   ├── main.py         # Main application logic
+│   ├── parser.py       # HTTP request parsing
+│   ├── formatter.py    # curl command formatting
+│   └── utils.py        # Utility functions
+├── install.sh          # Unix/macOS installer
+├── install.ps1         # Windows installer
+├── uninstall.sh        # Unix/macOS uninstaller
+├── uninstall.ps1       # Windows uninstaller
+├── LICENSE             # MIT License
+└── README.md           # This file
+```
+
 ## License
 
-MIT
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+Made with ❤️ by David
