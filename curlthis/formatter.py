@@ -13,15 +13,14 @@ def kadabra_format_curl(request_data: Dict[str, Any]) -> str:
     """
     Format parsed request data as a curl command.
     
-    Kadabra's psychic abilities and focus on transformation make it ideal for
-    converting structured data into a different format, in this case transforming
-    parsed HTTP request data into a curl command string.
+    This function transforms parsed HTTP request data into a properly escaped
+    curl command string that works across all platforms (Unix/Linux, macOS, Windows).
     
     Args:
         request_data: Dictionary containing parsed request components
         
     Returns:
-        A curl command string
+        A cross-platform compatible curl command string
     """
     method = request_data.get('method', 'GET')
     url = request_data.get('url', '')
@@ -29,25 +28,34 @@ def kadabra_format_curl(request_data: Dict[str, Any]) -> str:
     body = request_data.get('body')
     
     # Start building the curl command
-    curl_parts = [f"curl -X {method} '{url}'"]
+    curl_parts = [f"curl -X {method}"]
     
-    # Add headers
+    # Properly escape the URL for all platforms
+    escaped_url = shlex.quote(url)
+    curl_parts.append(escaped_url)
+    
+    # Add headers with proper escaping
     for header, value in headers.items():
         # Skip host header as it's included in the URL
         if header.lower() == 'host':
             continue
-        curl_parts.append(f"-H '{header}: {value}'")
+        # Escape the header value to handle special characters
+        header_arg = f"{header}: {value}"
+        escaped_header = shlex.quote(header_arg)
+        curl_parts.append(f"-H {escaped_header}")
     
-    # Add body if present
+    # Add body if present with proper escaping
     if body:
         # Try to detect if it's JSON
         try:
             json.loads(body)
-            # It's valid JSON, so use -d with single quotes
-            curl_parts.append(f"-d '{body}'")
+            # It's valid JSON, use -d with proper escaping
+            escaped_body = shlex.quote(body)
+            curl_parts.append(f"-d {escaped_body}")
         except (json.JSONDecodeError, TypeError):
-            # Not JSON or invalid JSON, use --data-raw
-            curl_parts.append(f"--data-raw '{body}'")
+            # Not JSON or invalid JSON, use --data-raw with proper escaping
+            escaped_body = shlex.quote(body)
+            curl_parts.append(f"--data-raw {escaped_body}")
     
-    # Join all parts with spaces
+    # Join all parts with spaces to create a true one-liner
     return ' '.join(curl_parts)

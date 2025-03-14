@@ -218,7 +218,7 @@ def create_section(title: str, style: str = "cyan") -> None:
     console.print(Rule(title=f"[bold {style}]{title}[/bold {style}]", style=style))
 
 
-def kadabra_display_code(code: str, language: str = "bash", title: str = "Generated code") -> None:
+def kadabra_display_code(code: str, language: str = "bash", title: str = "Generated code", line_numbers: bool = True) -> None:
     """Display code with syntax highlighting in a panel.
     
     Kadabra's transformation abilities make it perfect for formatting and
@@ -228,9 +228,10 @@ def kadabra_display_code(code: str, language: str = "bash", title: str = "Genera
         code: The code to display
         language: The language for syntax highlighting
         title: The title of the panel
+        line_numbers: Whether to display line numbers (default: True)
     """
     panel = Panel(
-        Syntax(code, language, theme="monokai", word_wrap=True, line_numbers=True),
+        Syntax(code, language, theme="monokai", word_wrap=True, line_numbers=line_numbers),
         title=f"[bold]{title}[/bold]",
         border_style="green",
         expand=False

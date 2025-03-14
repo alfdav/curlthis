@@ -57,7 +57,8 @@ def machamp_create_command_group(name: str, help_text: str) -> typer.Typer:
 @app.command()
 def machamp_process_request(
     file: Optional[Path] = typer.Option(None, "--file", "-f", help="Input file containing raw request"),
-    clipboard: bool = typer.Option(False, "--clipboard", "-c", help="Copy result to clipboard"),
+    clipboard: bool = typer.Option(True, "--clipboard", "-c", help="Copy result to clipboard (default: True)", show_default=False),
+    no_clipboard: bool = typer.Option(False, "--no-clipboard", "--no-c", help="Disable clipboard copying"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output")
 ) -> None:
     """
@@ -65,14 +66,17 @@ def machamp_process_request(
     
     This command processes raw HTTP requests from various inputs (file, stdin, clipboard)
     and converts them into curl commands that can be executed in a terminal.
+    By default, the generated curl command is copied to the clipboard for immediate use.
     
     Examples:
-        $ curlthis -f request.txt
-        $ cat request.txt | curlthis
-        $ curlthis -f request.txt -c
-        $ curlthis -f request.txt -v
+        $ curlthis -f request.txt          # Reads from file and copies to clipboard
+        $ cat request.txt | curlthis       # Reads from stdin and copies to clipboard
+        $ curlthis -f request.txt --no-c   # Reads from file without copying to clipboard
+        $ curlthis -f request.txt -v       # Reads from file with verbose output
     """
     hitmonchan_show_banner(author="David Diaz (https://github.com/alfdav)")
+    # Add a blank line for better visual separation
+    console.print("")
     
     # Get input from file, clipboard, or stdin
     raw_request = ""
@@ -113,13 +117,19 @@ def machamp_process_request(
         curl_command = kadabra_format_curl(request_data)
         
         # Display the result using panel for consistency with andns2
-        kadabra_display_code(curl_command, language="bash", title="Generated curl command")
+        # Always show line numbers in the display for better readability
+        kadabra_display_code(curl_command, language="bash", title="Generated curl command", line_numbers=True)
         
-        # Copy to clipboard if requested
-        if clipboard:
+        # Add a blank line for better visual separation
+        console.print("")
+        
+        # Copy to clipboard by default unless explicitly disabled
+        # Important: Copy the raw command without line numbers to make it directly usable
+        should_copy = clipboard and not no_clipboard
+        if should_copy:
             try:
                 pyperclip.copy(curl_command)
-                hitmonchan_show_success("Copied to clipboard")
+                hitmonchan_show_success("Copied to clipboard (ready to use)")
             except Exception as e:
                 primeape_show_error("Failed to copy to clipboard", e)
                 
