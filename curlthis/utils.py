@@ -118,7 +118,7 @@ def primeape_show_error(message: str, exception: Optional[Exception] = None) -> 
         error_console.print(f"[dim]{str(exception)}[/dim]")
 
 
-def primeape_show_warning(message: str) -> None:
+def primeape_show_warning(message: str, title: str = "Warning", multiline: bool = False) -> None:
     """Display warning message in a styled panel.
     
     Shows a yellow-bordered panel with the warning message to
@@ -126,12 +126,24 @@ def primeape_show_warning(message: str) -> None:
     
     Args:
         message: The warning message to display
+        title: The title of the warning panel
+        multiline: Whether the message contains multiple lines that should be preserved
     """
+    # Format the message based on whether it's multiline or not
+    if multiline:
+        # For multiline messages, preserve formatting but add styling
+        formatted_message = message.replace("\n", "\n")
+        content = Markdown(formatted_message)
+    else:
+        # For single-line messages, use simple styling
+        content = f"[bold yellow]WARNING:[/bold yellow] {message}"
+    
     # Create warning panel with standardized styling
     warning_panel = Panel(
-        f"[bold yellow]WARNING:[/bold yellow] {message}",
+        content,
         border_style="yellow", 
-        title="Warning"
+        title=title,
+        expand=True
     )
     console.print(warning_panel)
 
@@ -289,6 +301,47 @@ def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
     """
     system = platform.system().lower()
     
+    # Check for SSH session (where clipboard access typically fails)
+    is_ssh_session = False
+    try:
+        # Check common SSH environment variables
+        is_ssh_session = bool(os.environ.get('SSH_CLIENT') or os.environ.get('SSH_TTY') or 
+                             os.environ.get('SSH_CONNECTION'))
+    except Exception:
+        pass
+    
+    # For SSH sessions on Linux, provide immediate guidance
+    if is_ssh_session and system == "linux":
+        try:
+            import tempfile
+            import os
+            
+            # Save to file as the primary method for SSH sessions
+            fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
+            with os.fdopen(fd, 'w') as tmp:
+                tmp.write(text)
+            
+            ssh_msg = (
+                "**SSH Session Detected**\n\n"
+                "Clipboard operations are not available in SSH sessions without X11 forwarding.\n"
+                "Options:\n"
+                "1. Use the saved command file\n"
+                "2. Enable X11 forwarding with 'ssh -X' or 'ssh -Y' when connecting\n"
+                "3. Use the '--no-clipboard' flag to disable clipboard attempts\n\n"
+                f"Command saved to: {path}"
+            )
+            return False, ssh_msg
+        except Exception:
+            # If file saving fails, just return the SSH message
+            ssh_msg = (
+                "**SSH Session Detected**\n\n"
+                "Clipboard operations are not available in SSH sessions without X11 forwarding.\n"
+                "Options:\n"
+                "1. Enable X11 forwarding with 'ssh -X' or 'ssh -Y' when connecting\n"
+                "2. Use the '--no-clipboard' flag to disable clipboard attempts"
+            )
+            return False, ssh_msg
+    
     # Always try pyperclip first (maintain it as primary clipboard mechanism)
     try:
         import pyperclip
@@ -303,15 +356,16 @@ def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
         
         # For Linux systems, provide specific guidance
         if system == "linux":
-            # Check if the error is about missing clipboard utilities
-            if "not found" in error_msg.lower() and ("xclip" in error_msg.lower() or "xsel" in error_msg.lower()):
-                # Provide helpful installation instructions
-                install_msg = (
-                    "Clipboard operations on Linux require xclip or xsel.\n"
-                    "Install with: sudo apt install xclip\n"
-                    "Or: sudo apt install xsel\n\n"
-                    "After installation, you may need to log out and log back in,\n"
-                    "or restart your terminal session for pyperclip to detect them."
+            # Check if the DISPLAY environment variable is set
+            if not os.environ.get('DISPLAY'):
+                display_msg = (
+                    "**X11 Display Not Available**\n\n"
+                    "Clipboard operations on Linux require X11 display access.\n"
+                    "The DISPLAY environment variable is not set.\n\n"
+                    "Options:\n"
+                    "1. Run in a local desktop environment\n"
+                    "2. Use X11 forwarding with 'ssh -X' or 'ssh -Y'\n"
+                    "3. Use the '--no-clipboard' flag to disable clipboard attempts"
                 )
                 
                 # Try to save to file as fallback
@@ -323,10 +377,34 @@ def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
                     with os.fdopen(fd, 'w') as tmp:
                         tmp.write(text)
                     
-                    fallback_msg = f"{install_msg}\n\nCommand saved to: {path}"
+                    fallback_msg = f"{display_msg}\n\nCommand saved to: {path}"
                     return False, fallback_msg
                 except Exception:
-                    return False, install_msg
+                    return False, display_msg
+            
+            # Standard Linux clipboard utilities message
+            install_msg = (
+                "**Clipboard Access Failed**\n\n"
+                "Clipboard operations on Linux require xclip or xsel.\n"
+                "1. Install with: sudo apt install xclip\n"
+                "2. Or: sudo apt install xsel\n\n"
+                "After installation, you may need to log out and log back in,\n"
+                "or restart your terminal session for pyperclip to detect them."
+            )
+            
+            # Try to save to file as fallback
+            try:
+                import tempfile
+                import os
+                
+                fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
+                with os.fdopen(fd, 'w') as tmp:
+                    tmp.write(text)
+                
+                fallback_msg = f"{install_msg}\n\nCommand saved to: {path}"
+                return False, fallback_msg
+            except Exception:
+                return False, install_msg
                 
         # For macOS, try pbcopy as fallback
         if system == "darwin":

@@ -133,7 +133,8 @@ def machamp_process_request(
                 hitmonchan_show_success(message)
             else:
                 # Show a warning with helpful instructions instead of an error
-                primeape_show_warning(message)
+                # Use multiline=True to preserve formatting in the installation instructions
+                primeape_show_warning(message, title="Clipboard Issue", multiline=True)
                 
     except Exception as e:
         primeape_show_error("An unexpected error occurred", e)
