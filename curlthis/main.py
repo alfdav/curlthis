@@ -21,7 +21,7 @@ from curlthis.utils import (
     console, error_console, STATUS,
     hitmonchan_show_banner, primeape_show_error, primeape_show_warning,
     hitmonchan_show_success, hitmonchan_show_progress, create_table,
-    create_section, kadabra_display_code
+    create_section, kadabra_display_code, meowth_copy_to_clipboard
 )
 
 # Install Rich traceback handler
@@ -127,11 +127,13 @@ def machamp_process_request(
         # Important: Copy the raw command without line numbers to make it directly usable
         should_copy = clipboard and not no_clipboard
         if should_copy:
-            try:
-                pyperclip.copy(curl_command)
-                hitmonchan_show_success("Copied to clipboard (ready to use)")
-            except Exception as e:
-                primeape_show_error("Failed to copy to clipboard", e)
+            # Use the cross-platform clipboard function for better error handling
+            success, message = meowth_copy_to_clipboard(curl_command)
+            if success:
+                hitmonchan_show_success(message)
+            else:
+                # Show a warning with helpful instructions instead of an error
+                primeape_show_warning(message)
                 
     except Exception as e:
         primeape_show_error("An unexpected error occurred", e)

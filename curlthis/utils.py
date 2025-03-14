@@ -20,6 +20,9 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskPr
 from rich.theme import Theme
 from rich.rule import Rule
 from rich.markdown import Markdown
+import platform
+import subprocess
+import sys
 
 # Install Rich traceback handler for global exception beautification
 install_rich_traceback(show_locals=True, width=120, word_wrap=True)
@@ -270,3 +273,92 @@ def display_code(code: str, language: str = "bash", theme: str = "monokai",
         expand=False
     )
     console.print(panel)
+
+
+def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
+    """Copy text to clipboard with cross-platform support.
+    
+    This function provides a more robust clipboard handling mechanism with
+    platform-specific implementations and clear error messages.
+    
+    Args:
+        text: The text to copy to clipboard
+        
+    Returns:
+        A tuple containing (success_status, message)
+    """
+    system = platform.system().lower()
+    
+    # Always try pyperclip first (maintain it as primary clipboard mechanism)
+    try:
+        import pyperclip
+        pyperclip.copy(text)
+        return True, "Copied to clipboard (ready to use)"
+    except ImportError:
+        # Pyperclip not installed
+        return False, "Pyperclip not installed. Install with 'pip install pyperclip'."
+    except Exception as e:
+        # Pyperclip failed, provide better error messages and fallbacks
+        error_msg = str(e)
+        
+        # For Linux systems, provide specific guidance
+        if system == "linux":
+            # Check if the error is about missing clipboard utilities
+            if "not found" in error_msg.lower() and ("xclip" in error_msg.lower() or "xsel" in error_msg.lower()):
+                # Provide helpful installation instructions
+                install_msg = (
+                    "Clipboard operations on Linux require xclip or xsel.\n"
+                    "Install with: sudo apt install xclip\n"
+                    "Or: sudo apt install xsel\n\n"
+                    "After installation, you may need to log out and log back in,\n"
+                    "or restart your terminal session for pyperclip to detect them."
+                )
+                
+                # Try to save to file as fallback
+                try:
+                    import tempfile
+                    import os
+                    
+                    fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
+                    with os.fdopen(fd, 'w') as tmp:
+                        tmp.write(text)
+                    
+                    fallback_msg = f"{install_msg}\n\nCommand saved to: {path}"
+                    return False, fallback_msg
+                except Exception:
+                    return False, install_msg
+                
+        # For macOS, try pbcopy as fallback
+        if system == "darwin":
+            try:
+                process = subprocess.Popen('pbcopy', stdin=subprocess.PIPE, close_fds=True)
+                process.communicate(input=text.encode('utf-8'))
+                if process.returncode == 0:
+                    return True, "Copied to clipboard using pbcopy"
+            except Exception:
+                pass
+                
+        # For Windows, try clip.exe as fallback
+        elif system == "windows":
+            try:
+                process = subprocess.Popen('clip', stdin=subprocess.PIPE, close_fds=True)
+                process.communicate(input=text.encode('utf-8'))
+                if process.returncode == 0:
+                    return True, "Copied to clipboard using clip.exe"
+            except Exception:
+                pass
+        
+        # If all methods failed, save to file as fallback
+        try:
+            import tempfile
+            import os
+            
+            fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
+            with os.fdopen(fd, 'w') as tmp:
+                tmp.write(text)
+            
+            fallback_msg = f"Clipboard access failed. Command saved to: {path}"
+            return False, fallback_msg
+        except Exception:
+            # Last resort: just return the error
+            return False, f"Clipboard error: {error_msg}"
