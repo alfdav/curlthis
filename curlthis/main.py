@@ -120,13 +120,6 @@ def machamp_process_request(
             
         curl_command = kadabra_format_curl(request_data)
         
-        # Display the result using panel for consistency with andns2
-        # Always show line numbers in the display for better readability
-        kadabra_display_code(curl_command, language="bash", title="Generated curl command", line_numbers=True)
-        
-        # Add a blank line for better visual separation
-        console.print("")
-        
         # Check for SSH session
         is_ssh_session = False
         try:
@@ -136,8 +129,9 @@ def machamp_process_request(
         except Exception:
             pass
             
-        # For SSH sessions, display a plain one-liner that can be easily selected and copied
+        # Display the command differently based on session type
         if is_ssh_session:
+            # For SSH sessions, display a plain one-liner that can be easily selected and copied
             # First show a header with clear instructions
             console.print("\n[bold yellow]Copy-Paste Command:[/bold yellow]")
             console.print("[dim]The command below is formatted for easy selection in SSH environments:[/dim]")
@@ -154,6 +148,12 @@ def machamp_process_request(
             
             # Add a separator for visual clarity
             console.print("[dim]---[/dim]")
+        else:
+            # For regular sessions, display with syntax highlighting and line numbers
+            kadabra_display_code(curl_command, language="bash", title="Generated curl command", line_numbers=True)
+            
+            # Add a blank line for better visual separation
+            console.print("")
         
         # Copy to clipboard by default unless explicitly disabled
         # Important: Copy the raw command without line numbers to make it directly usable
