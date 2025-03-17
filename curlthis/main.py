@@ -7,6 +7,7 @@ Version: 0.1.0
 """
 from typing import Optional, List, Dict, Any
 import sys
+import os
 import typer
 import pyperclip
 from pathlib import Path
@@ -59,6 +60,7 @@ def machamp_process_request(
     file: Optional[Path] = typer.Option(None, "--file", "-f", help="Input file containing raw request"),
     clipboard: bool = typer.Option(True, "--clipboard", "-c", help="Copy result to clipboard (default: True)", show_default=False),
     no_clipboard: bool = typer.Option(False, "--no-clipboard", "--no-c", help="Disable clipboard copying"),
+    disable_clipboard: bool = typer.Option(False, "--disable-clipboard", "--ssh", help="Disable clipboard completely (useful for SSH sessions)"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output")
 ) -> None:
     """
@@ -72,6 +74,8 @@ def machamp_process_request(
         $ curlthis -f request.txt          # Reads from file and copies to clipboard
         $ cat request.txt | curlthis       # Reads from stdin and copies to clipboard
         $ curlthis -f request.txt --no-c   # Reads from file without copying to clipboard
+        $ curlthis --disable-clipboard     # Completely disables clipboard (for SSH sessions)
+        $ curlthis --ssh                   # Alias for --disable-clipboard
         $ curlthis -f request.txt -v       # Reads from file with verbose output
     """
     hitmonchan_show_banner(author="David Diaz (https://github.com/alfdav)")
@@ -123,9 +127,23 @@ def machamp_process_request(
         # Add a blank line for better visual separation
         console.print("")
         
+        # Check for SSH session
+        is_ssh_session = False
+        try:
+            # Check common SSH environment variables
+            is_ssh_session = bool(os.environ.get('SSH_CLIENT') or os.environ.get('SSH_TTY') or 
+                                os.environ.get('SSH_CONNECTION'))
+        except Exception:
+            pass
+            
+        # For SSH sessions, display a plain one-liner that can be easily selected and copied
+        if is_ssh_session:
+            console.print("\n[bold yellow]Copy-Paste Command:[/bold yellow]")
+            console.print(curl_command, highlight=False)
+        
         # Copy to clipboard by default unless explicitly disabled
         # Important: Copy the raw command without line numbers to make it directly usable
-        should_copy = clipboard and not no_clipboard
+        should_copy = clipboard and not no_clipboard and not disable_clipboard
         if should_copy:
             # Use the cross-platform clipboard function for better error handling
             success, message = meowth_copy_to_clipboard(curl_command)

@@ -23,6 +23,7 @@ from rich.markdown import Markdown
 import platform
 import subprocess
 import sys
+import os
 
 # Install Rich traceback handler for global exception beautification
 install_rich_traceback(show_locals=True, width=120, word_wrap=True)
@@ -314,7 +315,6 @@ def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
     if is_ssh_session and system == "linux":
         try:
             import tempfile
-            import os
             
             # Save to file as the primary method for SSH sessions
             fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
@@ -371,7 +371,6 @@ def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
                 # Try to save to file as fallback
                 try:
                     import tempfile
-                    import os
                     
                     fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
                     with os.fdopen(fd, 'w') as tmp:
@@ -395,7 +394,6 @@ def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
             # Try to save to file as fallback
             try:
                 import tempfile
-                import os
                 
                 fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
                 with os.fdopen(fd, 'w') as tmp:
