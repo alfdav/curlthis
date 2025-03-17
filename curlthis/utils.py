@@ -427,7 +427,6 @@ def meowth_copy_to_clipboard(text: str) -> tuple[bool, str]:
         # If all methods failed, save to file as fallback
         try:
             import tempfile
-            import os
             
             fd, path = tempfile.mkstemp(suffix=".txt", prefix="curlthis_")
             with os.fdopen(fd, 'w') as tmp:
