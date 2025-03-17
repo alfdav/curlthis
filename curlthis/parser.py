@@ -51,7 +51,10 @@ def alakazam_parse_request(raw_request: str) -> Dict[str, Any]:
     # Extract body if present
     body = None
     if body_start_index < len(lines):
-        body = '\n'.join(lines[body_start_index:])
+        body_content = '\n'.join(lines[body_start_index:])
+        # Only set body if there's actual content
+        if body_content.strip():
+            body = body_content
     
     # Construct URL
     url = f"{host}{path}" if host else path

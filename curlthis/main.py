@@ -60,7 +60,7 @@ def machamp_process_request(
     file: Optional[Path] = typer.Option(None, "--file", "-f", help="Input file containing raw request"),
     clipboard: bool = typer.Option(True, "--clipboard", "-c", help="Copy result to clipboard (default: True)", show_default=False),
     no_clipboard: bool = typer.Option(False, "--no-clipboard", "--no-c", help="Disable clipboard copying"),
-    disable_clipboard: bool = typer.Option(False, "--disable-clipboard", "--ssh", help="Disable clipboard completely (useful for SSH sessions)"),
+    disable_clipboard: bool = typer.Option(False, "--disable-clipboard", "--ssh", help="Force SSH mode: disable clipboard and use plain text display (useful for SSH sessions)"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output")
 ) -> None:
     """
@@ -74,9 +74,10 @@ def machamp_process_request(
         $ curlthis -f request.txt          # Reads from file and copies to clipboard
         $ cat request.txt | curlthis       # Reads from stdin and copies to clipboard
         $ curlthis -f request.txt --no-c   # Reads from file without copying to clipboard
-        $ curlthis --disable-clipboard     # Completely disables clipboard (for SSH sessions)
-        $ curlthis --ssh                   # Alias for --disable-clipboard
+        $ curlthis --ssh                   # Force SSH mode: plain text display and no clipboard
+        $ curlthis --disable-clipboard     # Same as --ssh (alias)
         $ curlthis -f request.txt -v       # Reads from file with verbose output
+        $ curlthis -f request.txt --ssh -v # Combines SSH mode with verbose output
     """
     hitmonchan_show_banner(author="David Diaz (https://github.com/alfdav)")
     # Add a blank line for better visual separation
@@ -120,20 +121,28 @@ def machamp_process_request(
             
         curl_command = kadabra_format_curl(request_data)
         
-        # Check for SSH session
+        # Check for SSH session or if --ssh flag was used
         is_ssh_session = False
         try:
             # Check common SSH environment variables
             is_ssh_session = bool(os.environ.get('SSH_CLIENT') or os.environ.get('SSH_TTY') or 
                                 os.environ.get('SSH_CONNECTION'))
+            
+            # Also treat as SSH session if --ssh or --disable-clipboard flag was used
+            is_ssh_session = is_ssh_session or disable_clipboard
         except Exception:
             pass
             
-        # Display the command differently based on session type
+        # Always display the syntax-highlighted version first
+        kadabra_display_code(curl_command, language="bash", title="Generated curl command", line_numbers=True)
+        
+        # Add a blank line for better visual separation
+        console.print("")
+        
+        # For SSH sessions or when --ssh flag is used, also display a plain text version for easy copying
         if is_ssh_session:
-            # For SSH sessions, display a plain one-liner that can be easily selected and copied
             # First show a header with clear instructions
-            console.print("\n[bold yellow]Copy-Paste Command:[/bold yellow]")
+            console.print("[bold yellow]Copy-Paste Command:[/bold yellow]")
             console.print("[dim]The command below is formatted for easy selection in SSH environments:[/dim]")
             
             # Add a blank line before the command for easier selection
@@ -148,12 +157,6 @@ def machamp_process_request(
             
             # Add a separator for visual clarity
             console.print("[dim]---[/dim]")
-        else:
-            # For regular sessions, display with syntax highlighting and line numbers
-            kadabra_display_code(curl_command, language="bash", title="Generated curl command", line_numbers=True)
-            
-            # Add a blank line for better visual separation
-            console.print("")
         
         # Copy to clipboard by default unless explicitly disabled
         # Important: Copy the raw command without line numbers to make it directly usable

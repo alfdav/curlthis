@@ -45,17 +45,19 @@ def kadabra_format_curl(request_data: Dict[str, Any]) -> str:
         curl_parts.append(f"-H {escaped_header}")
     
     # Add body if present with proper escaping
-    if body:
-        # Try to detect if it's JSON
-        try:
-            json.loads(body)
-            # It's valid JSON, use -d with proper escaping
-            escaped_body = shlex.quote(body)
-            curl_parts.append(f"-d {escaped_body}")
-        except (json.JSONDecodeError, TypeError):
-            # Not JSON or invalid JSON, use --data-raw with proper escaping
-            escaped_body = shlex.quote(body)
-            curl_parts.append(f"--data-raw {escaped_body}")
+    if body and body.strip():
+        # Check if the body looks like a raw HTTP request (starts with HTTP method or version)
+        if not any(body.strip().startswith(prefix) for prefix in ['GET ', 'POST ', 'PUT ', 'DELETE ', 'PATCH ', 'HEAD ', 'OPTIONS ', 'HTTP/']):
+            # Try to detect if it's JSON
+            try:
+                json.loads(body)
+                # It's valid JSON, use -d with proper escaping
+                escaped_body = shlex.quote(body)
+                curl_parts.append(f"-d {escaped_body}")
+            except (json.JSONDecodeError, TypeError):
+                # Not JSON or invalid JSON, use --data-raw with proper escaping
+                escaped_body = shlex.quote(body)
+                curl_parts.append(f"--data-raw {escaped_body}")
     
     # Join all parts with spaces to create a true one-liner
     return ' '.join(curl_parts)
