@@ -138,8 +138,22 @@ def machamp_process_request(
             
         # For SSH sessions, display a plain one-liner that can be easily selected and copied
         if is_ssh_session:
+            # First show a header with clear instructions
             console.print("\n[bold yellow]Copy-Paste Command:[/bold yellow]")
-            console.print(curl_command, highlight=False)
+            console.print("[dim]The command below is formatted for easy selection in SSH environments:[/dim]")
+            
+            # Add a blank line before the command for easier selection
+            console.print("")
+            
+            # Print the command as plain text with no styling or formatting
+            # This makes it extremely easy to select with triple-click or drag selection
+            console.print(curl_command, highlight=False, markup=False, emoji=False, overflow="fold")
+            
+            # Add a blank line after the command
+            console.print("")
+            
+            # Add a separator for visual clarity
+            console.print("[dim]---[/dim]")
         
         # Copy to clipboard by default unless explicitly disabled
         # Important: Copy the raw command without line numbers to make it directly usable
