@@ -6,7 +6,7 @@ using the Rich library. It follows the Pokemon-themed function naming convention
 with Fighting-type Pokemon for system operations.
 
 Author: David Diaz (https://github.com/alfdav)
-Version: 0.1.0
+Version: 1.0.0
 """
 from typing import Optional, Any, List, Dict, Union
 import sys
@@ -67,10 +67,10 @@ STATUS = {
 }
 
 
-def hitmonchan_show_banner(title: str = "curlthis v0.1.0", 
+def hitmonchan_show_banner(title: str = "curlthis v1.0.0",
                          description: str = "Transform raw HTTP requests into curl one-liners",
                          author: str = "David Diaz (https://github.com/alfdav)",
-                         version: str = "0.1.0") -> None:
+                         version: str = "1.0.0") -> None:
     """Display application banner with standardized styling.
     
     Creates a styled banner with the application title, description, version,

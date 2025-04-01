@@ -2,7 +2,7 @@
 Formatter module for curl commands.
 
 Author: David Diaz (https://github.com/alfdav)
-Version: 0.1.0
+Version: 1.0.0
 """
 from typing import Dict, Any
 import shlex

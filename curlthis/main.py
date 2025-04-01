@@ -3,7 +3,7 @@
 Main module for curlthis CLI application.
 
 Author: David Diaz (https://github.com/alfdav)
-Version: 0.1.0
+Version: 1.0.0
 """
 from typing import Optional, List, Dict, Any
 import sys
