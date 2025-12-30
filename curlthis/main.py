@@ -61,6 +61,8 @@ def machamp_process_request(
     clipboard: bool = typer.Option(True, "--clipboard", "-c", help="Copy result to clipboard (default: True)", show_default=False),
     no_clipboard: bool = typer.Option(False, "--no-clipboard", "--no-c", help="Disable clipboard copying"),
     disable_clipboard: bool = typer.Option(False, "--disable-clipboard", "--ssh", help="Force SSH mode: disable clipboard and use plain text display (useful for SSH sessions)"),
+    proxy: Optional[str] = typer.Option(None, "--proxy", "-p", help="Proxy server (e.g., http://proxy.example.com:8080)"),
+    cookie_jar: Optional[Path] = typer.Option(None, "--cookie-jar", "-j", help="Cookie jar file path for saving/loading cookies"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output")
 ) -> None:
     """
@@ -78,6 +80,8 @@ def machamp_process_request(
         $ curlthis --disable-clipboard     # Same as --ssh (alias)
         $ curlthis -f request.txt -v       # Reads from file with verbose output
         $ curlthis -f request.txt --ssh -v # Combines SSH mode with verbose output
+        $ curlthis -f request.txt --proxy http://proxy.example.com:8080  # Use proxy
+        $ curlthis -f request.txt --cookie-jar cookies.txt  # Save cookies to file
     """
     hitmonchan_show_banner(author="David Diaz (https://github.com/alfdav)")
     # Add a blank line for better visual separation
@@ -114,6 +118,17 @@ def machamp_process_request(
             hitmonchan_show_progress("Parsing raw request...", spinner=True)
         
         request_data = alakazam_parse_request(raw_request)
+        
+        # Add CLI-provided options to request data
+        if proxy:
+            request_data['proxy'] = proxy
+            if verbose:
+                hitmonchan_show_progress(f"Using proxy: {proxy}")
+        
+        if cookie_jar:
+            request_data['cookie_jar'] = str(cookie_jar)
+            if verbose:
+                hitmonchan_show_progress(f"Using cookie jar: {cookie_jar}")
         
         # Format as curl command
         if verbose:

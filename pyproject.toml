@@ -23,6 +23,19 @@ dependencies = [
     "pyperclip>=1.8.2",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --cov=curlthis"
+testpaths = [
+    "tests",
+]
+
 [project.scripts]
 curlthis = "curlthis.main:main"
 

@@ -42,6 +42,15 @@ cat request.txt | curlthis
 # Output to clipboard
 curlthis -c
 
+# Use proxy
+curlthis --proxy http://proxy.example.com:8080
+
+# Handle cookies with cookie jar
+curlthis --cookie-jar cookies.txt
+
+# SSH mode (no clipboard, plain text output)
+curlthis --ssh
+
 # Show verbose output
 curlthis -v
 
